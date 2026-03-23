@@ -15,6 +15,7 @@ while True:
     while guess != secret_number:
         user_input = input(f"Guess a number from {MIN_NUMBER} to {MAX_NUMBER}? ")
 
+        # Validate user input
         if not user_input.isdecimal():
             print(f"'{user_input}' is not a valid guess.")
             continue  # start at the top of the game loop again
