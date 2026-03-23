@@ -51,17 +51,17 @@ python3 code/chapter-02/guess_game_v1.py
 - Chapter 2: [`code/chapter-02/guess_game_v1.py`](code/chapter-02/guess_game_v1.py)
 - Chapter 3: [`code/chapter-03/guess_game_v2.py`](code/chapter-03/guess_game_v2.py)
 - Chapter 4: [`code/chapter-04/guess_game_v3.py`](code/chapter-04/guess_game_v3.py)
-- Chapter 5: [`code/chapter-05/guess_game_v4.py`](code/chapter-04/guess_game_v4.py)
-- Chapter 6: [`code/chapter-06/guess_game_v5.py`](code/chapter-04/guess_game_v5.py)
-- Chapter 7: [`code/chapter-07/guess_game_v6.py`](code/chapter-04/guess_game_v6.py)
-- Chapter 8: [`code/chapter-08/guess_game_v7.py`](code/chapter-04/guess_game_v7.py)
-- Chapter 9: [`code/chapter-09/guess_game_v8.py`](code/chapter-04/guess_game_v8.py)
+- Chapter 5: [`code/chapter-05/guess_game_v4.py`](code/chapter-05/guess_game_v4.py)
+- Chapter 6: [`code/chapter-06/guess_game_v5.py`](code/chapter-06/guess_game_v5.py)
+- Chapter 7: [`code/chapter-07/guess_game_v6.py`](code/chapter-07/guess_game_v6.py)
+- Chapter 8: [`code/chapter-08/guess_game_v7.py`](code/chapter-08/guess_game_v7.py)
+- Chapter 9: [`code/chapter-09/guess_game_v8.py`](code/chapter-09/guess_game_v8.py)
 - Chapter 10: [`code/chapter-10/prompts.md`](code/chapter-10/prompts.md)
 
 
 ## GitHub Pages
 
-This repository includes a companion GitHub Pages site in [`docs/`](docs/index.html).
+This repository includes a companion GitHub Pages site in [`docs/`](https://codewithintention.github.io/from-curiosity-to-code/index.html).
 
 ## Try extending the game
 
