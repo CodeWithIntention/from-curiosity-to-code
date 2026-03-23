@@ -58,6 +58,28 @@ python3 code/chapter-02/guess_game_v1.py
 - Chapter 9: `code/chapter-09/guess_game_v8.py`
 - Chapter 10: `code/chapter-10/prompts.md`
 
+
+## GitHub Pages
+
+This repository now includes a starter GitHub Pages site in `docs/`.
+
+Main files:
+
+- `docs/index.html`
+- `docs/chapter-guide.html`
+- `docs/getting-started.html`
+- `docs/challenge-ideas.html`
+- `docs/troubleshooting.html`
+- `docs/ai-prompts.html`
+- `docs/assets/styles.css`
+
+To publish it:
+
+1. Push the repo to GitHub.
+2. In the repo settings, open **Pages**.
+3. Set the source to **GitHub Actions**.
+4. Push to `main` and let the workflow deploy the `docs/` folder.
+
 ## Try extending the game
 
 Some ideas to explore:
