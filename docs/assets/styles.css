@@ -17,22 +17,16 @@ body {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   line-height: 1.6;
-  
-  /* background: linear-gradient(180deg, #0b1020 0%, #11172b 100%); */
-  
-  background-image: url("book-cover-bg.png"); 
-  
-  /* Prevent the image from repeating, which it does by default */
-  background-repeat: no-repeat; 
-  
-  /* Size the image to cover the entire background area */
-  background-size: cover; 
-  
-  /* Center the image within the body element */
-  background-position: center; 
-  
-  /* Fix the image in place so it doesn't scroll with the page content */
-  background-attachment: fixed; 
+  background: linear-gradient(rgba(10, 10, 20, 0.0), rgba(10, 10, 20, 0.2)),
+              url("book-cover-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #e6e6f0;
+  /* 
+  background: linear-gradient(180deg, #0b1020 0%, #11172b 100%); 
+  */
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -43,6 +37,26 @@ a:hover { text-decoration: underline; }
     radial-gradient(circle at top right, rgba(143, 180, 255, 0.20), transparent 26%),
     radial-gradient(circle at top left, rgba(201, 167, 255, 0.18), transparent 20%);
   border-bottom: 1px solid var(--line);
+}
+a.code {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.95rem;
+
+  color: #c9d1ff;
+  background-color: rgba(80, 80, 120, 0.25);
+
+  padding: 2px 6px;
+  border-radius: 4px;
+
+  text-decoration: none;
+  border: 1px solid rgba(120, 120, 180, 0.3);
+
+  transition: all 0.15s ease;
+}
+a.code:hover {
+  color: #ffffff;
+  background-color: rgba(120, 120, 200, 0.35);
+  border-color: rgba(160, 160, 220, 0.5);
 }
 .eyebrow {
   margin: 0 0 0.75rem;
