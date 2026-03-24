@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Curiosity to Code — Introduction</title>
+  <meta name="description" content="Introduction of From Curiosity to Code by Chuong M. Mai." />
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <style>
+    :_root {
+      --bg: #0d1020;
+      --panel: rgba(14, 18, 36, 0.78);
+      --text: #ece9f7;
+      --muted: #c9c2e3;
+      --accent: #f0d8a8;
+      --border: rgba(255, 255, 255, 0.12);
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    _body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(8, 10, 22, 0.45), rgba(8, 10, 22, 0.82)),
+        url("./assets/book-cover-bg.png") top center / cover no-repeat fixed;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(7, 9, 18, 0.68);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-wrap {
+      width: min(1100px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0.95rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand,
+    .site-nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .brand {
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .site-nav a {
+      font-size: 0.95rem;
+      color: var(--muted);
+      transition: color 0.15s ease;
+    }
+
+    .site-nav a:hover,
+    .brand:hover {
+      color: #ffffff;
+    }
+
+    .wrap {
+      width: min(860px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 4rem 0 5rem;
+    }
+
+    .intro {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 50px var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5rem;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 0 0 2rem;
+      font-size: clamp(2rem, 5vw, 3.3rem);
+      line-height: 1.08;
+      font-weight: normal;
+    }
+
+    p {
+      margin: 0 0 1.15rem;
+      font-size: 1.18rem;
+      line-height: 1.82;
+      color: var(--text);
+    }
+
+    .basic {
+      margin: 2rem 0;
+      padding: 1.25rem 1.4rem;
+      border-left: 3px solid rgba(240, 216, 168, 0.7);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 1rem;
+      line-height: 1.8;
+      color: var(--muted);
+      white-space: pre-line;
+    }
+
+    .closing {
+      margin-top: 2rem;
+      font-size: 1.22rem;
+      color: var(--accent);
+    }
+
+    @media (max-width: 700px) {
+      .nav-wrap {
+        width: min(100% - 1rem, 1100px);
+        padding: 0.85rem 0;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .site-nav {
+        gap: 0.75rem 1rem;
+      }
+
+      .site-nav a {
+        font-size: 0.92rem;
+      }
+
+      .wrap {
+        width: min(100% - 1rem, 860px);
+        padding: 1rem 0 2rem;
+      }
+
+      .intro {
+        padding: 1.5rem;
+        border-radius: 14px;
+      }
+
+      p {
+        font-size: 1.06rem;
+        line-height: 1.72;
+      }
+    }
+    .blinking-image {
+      /* Animation name, duration, timing function, iteration count */
+    animation: blink 1s step-end infinite;
+    }
+
+  @keyframes blink {
+    from, to {
+      opacity: 0; /* Image is transparent */
+    }
+    50% {
+      opacity: 1; /* Image is visible */
+    }
+  }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">From Curiosity to Code</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="getting-started.html">Getting Started</a>
+        <a href="chapter-guide.html">Chapter Guide</a>
+        <a href="challenge-ideas.html">Challenges</a>
+        <a href="ai-prompts.html">AI Prompts</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <article class="intro">
+      <p class="eyebrow">From Curiosity to Code</p>
+      <h1>Introduction</h1>
+
+      <p>So you’re curious about what it takes to become a programmer.</p>
+
+      <p>Maybe you picture a dimly lit room with a desk in the back corner. Someone hunched over a keyboard, while a glowing screen pushes back the darkness as lines of strange symbols scroll off its edge. You can vaguely make out a few words in English, but the rest might as well be a foreign language.</p>
+
+      <p>What exactly is that person doing?</p>
+
+      <p>The truth is far less mysterious than it looks.</p>
+
+      <p>At its core, programming is telling a computer what to do. With it, we can solve problems, analyze information, play games, or even simulate a vast 3D world of heroes and heroines.</p>
+
+      <p>I still remember the moment I first caught a glimpse of the world of computer programming.</p>
+
+      <p>It was the early 80s, when I was in my early teens. My father, a computer programmer for a local company, took me to Toys "R" Us on a father and son shopping trip. It was no ordinary shopping trip. We were there to buy our first computer.</p>
+
+      <p>He carefully looked over the selection and settled on a TI-99/4A. It pales in comparison to what we have today. Back then, it was more than I had ever imagined.</p>
+
+      <p>I remember that moment vividly. My father stood at the in-store display, his hands hovering over the keyboard, his fingers moving with practiced precision. I watched the flickering TV as he typed into that little TI-99/4A. After he typed <strong>RUN</strong> and pressed Enter, it responded immediately with a question mark and a blinking cursor.</p>
+
+      <p>He typed 1, then pressed Enter.</p>
+      <p>Then the TI responded with another question mark.</p>
+      <p>He typed 2, then pressed Enter.</p>
+
+      <div class="basic">TI BASIC READY
+&gt;10 INPUT A
+&gt;20 INPUT B
+&gt;30 PRINT A+B
+&gt;RUN
+? 1
+? 2
+ 3
+** DONE **
+&gt;<a class="blinking-image">&#25;</a></div>
+      <p>Then that blinking cursor appeared again.</p>
+
+      <p>When the number 3 appeared on the TV screen, I stared at it for a moment. Something sparked inside of me. I already knew that 1 + 2 was 3. But neither of us had added it. The computer had.</p>
+
+      <p>My first thought was simple: “Whoa… he told it to do that!” In that moment, I realized that words typed into a computer could make it do something.</p>
+
+      <p>That moment sparked a curiosity that would grow into a four-decade career and a lifetime passion for building software.</p>
+
+      <p>Today, AI can generate code that works, but code alone is not software. Programmers build software.</p>
+
+      <p class="closing">This book is your chance to discover what that actually feels like.</p>
+    </article>
+  </main>
+</body>
+</html>
