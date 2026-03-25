@@ -7,17 +7,6 @@
   <link rel="stylesheet" href="./assets/styles.css" />
   <style>
 
-    .wrap {
-      width: min(1180px, calc(100% - 2rem));
-      margin: 0 auto;
-      padding: 2rem 0 4rem;
-    }
-
-    .hero {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
     .eyebrow {
       margin: 0 0 0.5rem;
       font-family: Arial, Helvetica, sans-serif;
@@ -25,21 +14,6 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--accent);
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      line-height: 1.08;
-      font-weight: normal;
-    }
-
-    .subhead {
-      width: min(760px, 100%);
-      margin: 1rem auto 0;
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: var(--muted);
     }
 
     .controls {
@@ -106,19 +80,19 @@
         url("assets/book-cover-bg.png") center / cover no-repeat;
     }
 
-    .cover-overlay,
-    .back-overlay {
-      position: absolute;
-      inset: 0;
-      padding: 2rem 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      text-align: center;
-      background:
-        /*linear-gradient(rgba(10, 10, 20, 0.18), rgba(10, 10, 20, 0.52)),*/
-        url("./assets/book-front-cover.png") center / cover no-repeat;
-    }
+.cover-overlay,
+.back-overlay {
+  position: absolute;
+  inset: 0;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  background:
+    /*linear-gradient(rgba(10, 10, 20, 0.18), rgba(10, 10, 20, 0.52)),*/
+    url("assets/book-front-cover.png") center / cover no-repeat;
+}
 
     .cover-top {
       margin-top: 1rem;
@@ -335,11 +309,16 @@
     </div>
   </header>
 
-  <main class="wrap">
+  <main>
     <section class="hero">
-      <p class="eyebrow">Book Preview</p>
-      <h1>Open the Book</h1>
-      <p class="subhead">This preview lets the reader move from the front cover into the Introduction, turn to the Epilogue, and then close on the back cover.</p>
+      <div class="wrap">
+        <center>
+          <h1>Book Preview</h1>
+          <div>
+            <a class="button primary" href="https://a.co/d/0cB0VZ4j" target="_blank">View on Amazon</a>
+          </div>
+        </center>
+      </div>
     </section>
 
     <div class="controls" aria-label="Preview navigation">
