@@ -6,77 +6,6 @@
   <title>From Curiosity to Code — Preview</title>
   <link rel="stylesheet" href="./assets/styles.css" />
   <style>
-    :_root {
-      --bg: #0d1020;
-      --panel: rgba(14, 18, 36, 0.78);
-      --text: #ece9f7;
-      --muted: #c9c2e3;
-      --accent: #f0d8a8;
-      --border: rgba(255, 255, 255, 0.12);
-      --shadow: rgba(0, 0, 0, 0.35);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    _body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Georgia, "Times New Roman", serif;
-      color: var(--text);
-      background:
-        linear-gradient(rgba(8, 10, 22, 0.45), rgba(8, 10, 22, 0.82)),
-        url("./assets/book-cover-bg.png") top center / cover no-repeat fixed;
-    }
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: blur(10px);
-      background: rgba(7, 9, 18, 0.72);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .nav-wrap {
-      width: min(1100px, calc(100% - 2rem));
-      margin: 0 auto;
-      padding: 0.95rem 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .brand,
-    .site-nav a {
-      text-decoration: none;
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .brand {
-      font-size: 1rem;
-      letter-spacing: 0.04em;
-      white-space: nowrap;
-    }
-
-    .site-nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .site-nav a {
-      font-size: 0.95rem;
-      color: var(--muted);
-      transition: color 0.15s ease;
-    }
-
-    .site-nav a:hover,
-    .brand:hover {
-      color: #ffffff;
-    }
 
     .wrap {
       width: min(1180px, calc(100% - 2rem));
@@ -454,12 +383,15 @@
         opacity: 1; /* Image is visible */
       }
     }
+    .page ul {
+      margin-left: 1.25rem;
+    }
   </style>
 </head>
 <body>
   <header class="site-header">
     <div class="nav-wrap">
-      <a class="brand" href="index.html">From Curiosity to Code</a>
+      <a class="brand" href="index.html"><strong>From Curiosity to Code</strong></a>
       <nav class="site-nav" aria-label="Primary">
         <a href="index.html">Home</a>
         <a href="getting-started.html">Getting Started</a>
@@ -494,9 +426,8 @@
 
         <section class="pages">
           <div class="single-panel active" data-panel="intro">
-            <article  class="page page-left">
-              <p class="eyebrow">From Curiosity to Code</p>
-              <h1>Introduction</h1>
+            <article  class="page">
+              <h2>Introduction</h2>
 
               <p>So you’re curious about what it takes to become a programmer.</p>
 
@@ -521,15 +452,16 @@
               <p>He typed 2, then pressed Enter.</p>
 
               <div class="basic">TI BASIC READY
-        &gt;10 INPUT A
-        &gt;20 INPUT B
-        &gt;30 PRINT A+B
-        &gt;RUN
-        ? 1
-        ? 2
-        3
-        ** DONE **
-        &gt;<a class="blinking-image">&#25;</a></div>
+                &gt;10 INPUT A
+                &gt;20 INPUT B
+                &gt;30 PRINT A+B
+                &gt;RUN
+                ? 1
+                ? 2
+                &nbsp;3
+                ** DONE **
+                &gt;<a class="blinking-image">&#25;</a>
+              </div>
               <p>Then that blinking cursor appeared again.</p>
 
               <p>When the number 3 appeared on the TV screen, I stared at it for a moment. Something sparked inside of me. I already knew that 1 + 2 was 3. But neither of us had added it. The computer had.</p>
@@ -542,10 +474,10 @@
 
               <p class="closing">This book is your chance to discover what that actually feels like.</p>
             </article>
-            </div>
+          </div>
 
             <div class="single-panel" data-panel="epilogue">
-              <article class="page page-left">
+              <article class="page">
                 <h2>Epilogue</h2>
                 <p class="lead">I will never forget that day at Toys "R" Us with my father.</p>
                 <p>It was simple.</p>
@@ -562,7 +494,7 @@
                 <p>Write something small. Let it break. Fix it. Make it better. Then do it again.</p>
                 <p>That is how this begins.</p>
               </article>
-          </div>
+            </div>
 
           <div class="single-panel" data-panel="back">
             <div class="page">
@@ -580,12 +512,12 @@
                 and how to approach problems like a programmer.
               </p>
               <ul>
-                <li>• Write your first program</li>
-                <li>• Make programs think</li>
-                <li>• Do more with less effort</li>
-                <li>• Handle unexpected input</li>
-                <li>• Improve and refine your code</li>
-                <li>• Use AI to support your learning</li>
+                <li>Write your first program</li>
+                <li>Make programs think</li>
+                <li>Do more with less effort</li>
+                <li>Handle unexpected input</li>
+                <li>Improve and refine your code</li>
+                <li>Use AI to support your learning</li>
               </ul>
               <br/>
               <br/>

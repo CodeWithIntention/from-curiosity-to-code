@@ -7,10 +7,23 @@
   <link rel="stylesheet" href="./assets/styles.css" />
 </head>
 <body>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html"><strong>From Curiosity to Code</strong></a>
+      
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="getting-started.html">Getting Started</a>
+        <a href="chapter-guide.html">Chapter Guide</a>
+        <a href="challenge-ideas.html">Challenges</a>
+        <a href="ai-prompts.html">AI Prompts</a>
+      </nav>
+    </div>
+  </header>
+
   <main>
     <section class="page-hero">
       <div class="wrap">
-        <a class="back-link" href="./index.html">← Back to home</a>
         <h1>Chapter Guide</h1>
         <p>Use this page to map the book to the source files in the repository.</p>
       </div>
@@ -40,24 +53,21 @@
           <h2>How to run a file</h2>
           <p>
             To run the code, copy it into your Python environment and execute it locally.
-          </p>
-          <p>
+            <br/>
             You can also download the raw file from GitHub.
           </p>
+          <p>
+            From a terminal or command prompt, you can run the file with a command like this:
+          </p>
+          <pre><code>python code/chapter-02/guess_game_v1.py</code></pre>
+          <p>If that does not work, try:</p>
+          <pre><code>python3 code/chapter-02/guess_game_v1.py</code></pre>
         </div>
       </div>
     </section>
   </main>
   <footer class="footer">
     <div class="wrap footer-grid">
-      <p><strong>From Curiosity to Code</strong><br />Companion source code and learning resources.</p>
-      <nav>
-        <a href="./getting-started.html">Getting Started</a>
-        <a href="./chapter-guide.html">Chapter Guide</a>
-        <a href="./challenge-ideas.html">Challenges</a>
-        <a href="./troubleshooting.html">Troubleshooting</a>
-        <a href="./ai-prompts.html">AI Prompts</a>
-      </nav>
     </div>
   </footer>
 </body>
