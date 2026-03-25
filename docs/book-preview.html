@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Curiosity to Code — Preview</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <style>
+    :_root {
+      --bg: #0d1020;
+      --panel: rgba(14, 18, 36, 0.78);
+      --text: #ece9f7;
+      --muted: #c9c2e3;
+      --accent: #f0d8a8;
+      --border: rgba(255, 255, 255, 0.12);
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    _body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+      background:
+        linear-gradient(rgba(8, 10, 22, 0.45), rgba(8, 10, 22, 0.82)),
+        url("./assets/book-cover-bg.png") top center / cover no-repeat fixed;
+    }
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      background: rgba(7, 9, 18, 0.72);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-wrap {
+      width: min(1100px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 0.95rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand,
+    .site-nav a {
+      text-decoration: none;
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .brand {
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .site-nav a {
+      font-size: 0.95rem;
+      color: var(--muted);
+      transition: color 0.15s ease;
+    }
+
+    .site-nav a:hover,
+    .brand:hover {
+      color: #ffffff;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .eyebrow {
+      margin: 0 0 0.5rem;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.08;
+      font-weight: normal;
+    }
+
+    .subhead {
+      width: min(760px, 100%);
+      margin: 1rem auto 0;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .controls button {
+      border: 1px solid rgba(240, 216, 168, 0.25);
+      background: rgba(240, 216, 168, 0.08);
+      color: var(--text);
+      padding: 0.8rem 1rem;
+      border-radius: 999px;
+      font: inherit;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .controls button:hover {
+      transform: translateY(-1px);
+      background: rgba(240, 216, 168, 0.14);
+      border-color: rgba(240, 216, 168, 0.4);
+    }
+
+    .controls button.active {
+      background: rgba(240, 216, 168, 0.18);
+      border-color: rgba(240, 216, 168, 0.55);
+      color: #fff8ea;
+    }
+
+    .viewer-shell {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 1.5rem;
+      box-shadow: 0 22px 60px var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .book-stack {
+      position: sticky;
+      top: 6.5rem;
+    }
+
+    .book-visual {
+      aspect-ratio: 2 / 3;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      background:
+        linear-gradient(rgba(10, 10, 20, 0.18), rgba(10, 10, 20, 0.52)),
+        url("assets/book-cover-bg.png") center / cover no-repeat;
+    }
+
+    .cover-overlay,
+    .back-overlay {
+      position: absolute;
+      inset: 0;
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+      background:
+        linear-gradient(rgba(10, 10, 20, 0.18), rgba(10, 10, 20, 0.52)),
+        url("./assets/book-front-cover.png") center / cover no-repeat;
+    }
+
+    .cover-top {
+      margin-top: 1rem;
+    }
+
+    .cover-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.03;
+      margin: 0;
+    }
+
+    .cover-subtitle {
+      margin: 1rem auto 0;
+      width: min(90%, 240px);
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #f1ebff;
+    }
+
+    .cover-author {
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #f0d8a8;
+    }
+
+    .back-copy {
+      text-align: left;
+      align-self: center;
+      background: rgba(8, 10, 20, 0.42);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.25rem;
+      line-height: 1.7;
+      font-size: 1rem;
+      color: #f0ebff;
+    }
+
+    .back-copy p {
+      margin: 0 0 1rem;
+    }
+
+    .back-copy p:last-child {
+      margin-bottom: 0;
+    }
+
+    .book-meta {
+      margin-top: 1rem;
+      padding: 1rem 1.1rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 0.98rem;
+    }
+
+    .pages {
+      min-height: 720px;
+      position: relative;
+    }
+
+    .page-spread {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .page-spread.active {
+      display: grid;
+    }
+
+    .page {
+      min-height: 720px;
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25), 0 16px 34px rgba(0, 0, 0, 0.25);
+      padding: 2.2rem 2rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(0,0,0,0.02));
+      pointer-events: none;
+    }
+
+    .page-left::before,
+    .page-right::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 18px;
+      pointer-events: none;
+    }
+
+    .page-left::before {
+      right: 0;
+      background: linear-gradient(to left, rgba(0,0,0,0.08), rgba(0,0,0,0));
+    }
+
+    .page-right::before {
+      left: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.08), rgba(0,0,0,0));
+    }
+
+    .page h2 {
+      margin: 0 0 1.4rem;
+      font-size: 2rem;
+      font-weight: normal;
+      line-height: 1.1;
+    }
+
+    .page p {
+      margin: 0 0 1rem;
+      font-size: 1.06rem;
+      line-height: 1.78;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page .lead {
+      font-size: 1.14rem;
+    }
+
+    .basic {
+      margin: 1.25rem 0;
+      padding: 1rem 1.1rem;
+      border-left: 3px solid rgba(73, 91, 150, 0.5);
+      background: rgba(40, 52, 88, 0.07);
+      border-radius: 10px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 0.96rem;
+      line-height: 1.7;
+      white-space: pre-line;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-number {
+      position: absolute;
+      bottom: 1rem;
+      font-size: 0.92rem;
+      color: rgba(0,0,0,0.48);
+      z-index: 1;
+    }
+
+    .page-left .page-number {
+      left: 2rem;
+    }
+
+    .page-right .page-number {
+      right: 2rem;
+    }
+
+    .page-note {
+      font-size: 0.95rem;
+      color: #5b5b5b;
+      font-style: italic;
+    }
+
+    .single-panel {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .single-panel.active {
+      display: block;
+    }
+
+    .single-panel .page {
+      min-height: 720px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 960px) {
+      body {
+        background-attachment: scroll;
+        background-position: center top;
+      }
+
+      .stage {
+        grid-template-columns: 1fr;
+      }
+
+      .book-stack {
+        position: static;
+      }
+
+      .page-spread.active {
+        grid-template-columns: 1fr;
+      }
+
+      .page-right::before,
+      .page-left::before {
+        display: none;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .nav-wrap {
+        width: min(100% - 1rem, 1100px);
+        padding: 0.85rem 0;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .site-nav {
+        gap: 0.75rem 1rem;
+      }
+
+      .site-nav a {
+        font-size: 0.92rem;
+      }
+
+      .wrap {
+        width: min(100% - 1rem, 1180px);
+        padding: 1rem 0 2rem;
+      }
+
+      .viewer-shell {
+        padding: 1rem;
+        border-radius: 18px;
+      }
+
+      .page,
+      .single-panel .page {
+        min-height: auto;
+        padding: 1.5rem 1.25rem 2.25rem;
+        border-radius: 14px;
+      }
+
+      .page h2 {
+        font-size: 1.6rem;
+      }
+
+      .page p {
+        font-size: 1rem;
+        line-height: 1.72;
+      }
+    }
+    .blinking-image {
+      /* Animation name, duration, timing function, iteration count */
+    animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to {
+        opacity: 0; /* Image is transparent */
+      }
+      50% {
+        opacity: 1; /* Image is visible */
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-wrap">
+      <a class="brand" href="index.html">From Curiosity to Code</a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="getting-started.html">Getting Started</a>
+        <a href="chapter-guide.html">Chapter Guide</a>
+        <a href="challenge-ideas.html">Challenges</a>
+        <a href="ai-prompts.html">AI Prompts</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Book Preview</p>
+      <h1>Open the Book</h1>
+      <p class="subhead">This preview lets the reader move from the front cover into the Introduction, turn to the Epilogue, and then close on the back cover.</p>
+    </section>
+
+    <div class="controls" aria-label="Preview navigation">
+      <button class="active" data-view="intro">Introduction</button>
+      <button data-view="epilogue">Epilogue</button>
+      <button data-view="back">Back Cover</button>
+    </div>
+
+    <section class="viewer-shell">
+      <div class="stage">
+        <aside class="book-stack">
+          <div class="book-visual" id="bookVisual">
+            <div class="cover-overlay" id="coverOverlay">
+            </div>
+          </div>
+        </aside>
+
+        <section class="pages">
+          <div class="single-panel active" data-panel="intro">
+            <article  class="page page-left">
+              <p class="eyebrow">From Curiosity to Code</p>
+              <h1>Introduction</h1>
+
+              <p>So you’re curious about what it takes to become a programmer.</p>
+
+              <p>Maybe you picture a dimly lit room with a desk in the back corner. Someone hunched over a keyboard, while a glowing screen pushes back the darkness as lines of strange symbols scroll off its edge. You can vaguely make out a few words in English, but the rest might as well be a foreign language.</p>
+
+              <p>What exactly is that person doing?</p>
+
+              <p>The truth is far less mysterious than it looks.</p>
+
+              <p>At its core, programming is telling a computer what to do. With it, we can solve problems, analyze information, play games, or even simulate a vast 3D world of heroes and heroines.</p>
+
+              <p>I still remember the moment I first caught a glimpse of the world of computer programming.</p>
+
+              <p>It was the early 80s, when I was in my early teens. My father, a computer programmer for a local company, took me to Toys "R" Us on a father and son shopping trip. It was no ordinary shopping trip. We were there to buy our first computer.</p>
+
+              <p>He carefully looked over the selection and settled on a TI-99/4A. It pales in comparison to what we have today. Back then, it was more than I had ever imagined.</p>
+
+              <p>I remember that moment vividly. My father stood at the in-store display, his hands hovering over the keyboard, his fingers moving with practiced precision. I watched the flickering TV as he typed into that little TI-99/4A. After he typed <strong>RUN</strong> and pressed Enter, it responded immediately with a question mark and a blinking cursor.</p>
+
+              <p>He typed 1, then pressed Enter.</p>
+              <p>Then the TI responded with another question mark.</p>
+              <p>He typed 2, then pressed Enter.</p>
+
+              <div class="basic">TI BASIC READY
+        &gt;10 INPUT A
+        &gt;20 INPUT B
+        &gt;30 PRINT A+B
+        &gt;RUN
+        ? 1
+        ? 2
+        3
+        ** DONE **
+        &gt;<a class="blinking-image">&#25;</a></div>
+              <p>Then that blinking cursor appeared again.</p>
+
+              <p>When the number 3 appeared on the TV screen, I stared at it for a moment. Something sparked inside of me. I already knew that 1 + 2 was 3. But neither of us had added it. The computer had.</p>
+
+              <p>My first thought was simple: “Whoa… he told it to do that!” In that moment, I realized that words typed into a computer could make it do something.</p>
+
+              <p>That moment sparked a curiosity that would grow into a four-decade career and a lifetime passion for building software.</p>
+
+              <p>Today, AI can generate code that works, but code alone is not software. Programmers build software.</p>
+
+              <p class="closing">This book is your chance to discover what that actually feels like.</p>
+            </article>
+            </div>
+
+            <div class="single-panel" data-panel="epilogue">
+              <article class="page page-left">
+                <h2>Epilogue</h2>
+                <p class="lead">I will never forget that day at Toys "R" Us with my father.</p>
+                <p>It was simple.</p>
+                <p>It left a lasting impression.</p>
+                <p>It opened a whole new world to me.</p>
+                <p>I hope what you’ve experienced has opened a whole new world for you too.</p>
+                <p>Not all at once.</p>
+                <p>But little by little.</p>
+                <p>A line here. An improvement there.</p>
+                <p>It grows. You grow.</p>
+                <p>Somewhere along the way, something changes too. The way you look at problems. The way you think them through. The way you know this can be figured out.</p>
+                <p>The tools will change. They already have. But the quiet moments where you decide what belongs and what does not, that part is still yours.</p>
+                <p>There is more ahead. Good.</p>
+                <p>Write something small. Let it break. Fix it. Make it better. Then do it again.</p>
+                <p>That is how this begins.</p>
+              </article>
+          </div>
+
+          <div class="single-panel" data-panel="back">
+            <div class="page">
+              <h2>Back Cover</h2>
+              <p class="lead"><b>Learn how to think like a programmer.</b> 
+                <p>
+                  Programming isn’t about memorizing syntax. It’s about learning how to think.
+                </p>
+              <p>
+                This book teaches programming basics not through syntax and memorization, 
+                but by doing—writing something small, enhancing it, watching it break, 
+                fixing it, and making it better.
+              <p>
+                You’ll learn how programs evolve through small, meaningful iterations, 
+                and how to approach problems like a programmer.
+              </p>
+              <ul>
+                <li>• Write your first program</li>
+                <li>• Make programs think</li>
+                <li>• Do more with less effort</li>
+                <li>• Handle unexpected input</li>
+                <li>• Improve and refine your code</li>
+                <li>• Use AI to support your learning</li>
+              </ul>
+              <br/>
+              <br/>
+              <p class="closing">
+                <p><b>About the Author</b></p>
+                <p>
+                  Chuong Mai is a software engineer with decades of experience 
+                  building systems and solving real-world problems.
+                </p>
+                <p>
+                  This book reflects that journey—from first curiosity to real understanding.
+                </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const buttons = document.querySelectorAll('.controls button');
+    const panels = document.querySelectorAll('[data-panel]');
+    const coverOverlay = document.getElementById('coverOverlay');
+    const backOverlay = document.getElementById('backOverlay');
+
+    function showView(view) {
+      buttons.forEach((button) => {
+        button.classList.toggle('active', button.dataset.view === view);
+      });
+
+      panels.forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.panel === view);
+      });
+
+      if (view === 'back') {
+        coverOverlay.hidden = true;
+        backOverlay.hidden = false;
+      } else {
+        coverOverlay.hidden = false;
+        backOverlay.hidden = true;
+      }
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => showView(button.dataset.view));
+    });
+  </script>
+</body>
+</html>
