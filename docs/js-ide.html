@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Curiosity to Code -- JavaScript IDE</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+  <script src="https://unpkg.com/prettier@3.3.3/standalone.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/babel.js"></script>
+  <script src="https://unpkg.com/prettier@3.3.3/plugins/estree.js"></script>
+
+  <style>
+    :root {
+      --bg-url: url("https://codewithintention.github.io/from-curiosity-to-code/assets/book-cover-bg.png");
+      --bg: white;
+      --panel: transparent;
+      --border: #d7dce5;
+      --text: white ;
+      --button-text:var(--editor-bg);
+      --muted: #dce2ee;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --danger: #dc2626;
+      --editor-bg: #1e1e1e;
+      --editor-border: #2c2c2c;
+      --editor-text: #d4d4d4;
+      --shell-bg: #0f172a;
+      --shell-text: #e5e7eb;
+      --shell-muted: #94a3b8;
+      --shell-input: #111827;
+      --shell-prompt: #93c5fd;
+      --shell-border: var(--border);
+      --handle: #cbd5e1;
+      --disabled: #e5e7eb;
+      --min-editor-width: 480px;
+      --min-shell-width: 240px;
+      --control-padding: 4px 8px;
+      --control-radius: 6px;
+      --bg-accent: #8fb4ff;
+      --bg-accent-2: #c9a7ff;
+      --bg-accent-hover: #c9a7ff;
+      --editor-font: 15px/1.5 Consolas, "Courier New", monospace;
+      --editor-line-height: 1.5;
+      --editor-line-numbers-width: 48px;
+      --editor-line-numbers-color: rgba(107, 114, 128, 0.9);
+      --editor-line-number-active-bg: rgba(255, 255, 255, 0.25);
+      --editor-line-number-active-color: #e5e7eb;
+      --editor-calc-width: calc(100% - var(--editor-line-numbers-width));
+    }
+
+    * { box-sizing: border-box; }
+    
+    html, body { height: 100%; margin: 0; font-family: Arial, Helvetica, sans-serif; }
+
+    body { 
+      display: flex; flex-direction: column; color: var(--text); 
+      color: var(--button-text);
+      background: var(--bg-url);
+      background-size: cover;
+      background-position: top center;
+      background-repeat: no-repeat;
+      background-attachment: fixed; /* desktop */
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .app-title { font-size: 18px; font-weight: 700; color: var(--text); }
+    .app-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .pane {
+      display: flex;
+      flex-direction: column;
+      min-width: 0px;
+      min-height: 0;
+      background: var(--panel);
+    }
+
+    .pane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .pane-title { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .editor-footer {
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    .toolbar .group {
+      display:flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 5px;
+      gap: 8px;
+    }
+
+    .toolbar .control {
+      display:flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .toolbar input {
+      padding: var(--control-padding); 
+      border: 1px solid var(--border); 
+      border-radius: var(--control-radius); 
+      font-size: 13px; 
+    }
+
+    .toolbar button {
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--button-text);
+      border-radius: var(--control-radius);
+      padding: var(--control-padding);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    
+    label {
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover { border-color: #b9c2d0; background-color: var(--bg-accent-hover);}
+    .toolbar button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    .toolbar button.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .toolbar button.shell:hover { background: var(--bg-accent-hover); border-color: var(--bg-accent-hover); }
+    .toolbar button.danger { color: var(--danger); }
+    .toolbar button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      border-color: var(--disabled);
+    }
+
+    .editor-wrap {
+      flex: 1;
+      min-height: 0;
+      background: var(--editor-bg);
+      border-top: 1px solid var(--editor-border);
+      border-bottom: 1px solid var(--editor-border);
+    }
+
+    .editor-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: var(--editor-bg);
+      overflow: auto;
+    }
+
+    .editor-container #toggleLineNumbersBtn {
+      position: sticky;
+      left: 0;
+      top: 0;
+      padding: 0; 
+      border: 0; 
+      border-radius: 0; 
+      background: transparent;
+      color: var(--text);
+      z-index: 4;
+      font-size: 8px;
+    }
+
+    #lineNumbers {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: var(--editor-line-numbers-width);
+      height: 100%;
+      padding: 16px 6px 32px 6px;
+      text-align: right;
+      font: var(--editor-font);
+      white-space: pre;
+      color: var(--editor-line-numbers-color);
+      background: var(--editor-bg);
+      border-right: 1px solid var(--editor-text);
+      overflow: hidden;
+      user-select: none;
+      box-sizing: border-box;
+      z-index: 3;
+    }
+
+    #lineNumbers .line-number {
+      height: var(--editor-line-height);
+    }
+
+    #lineNumbers .line-number.active {
+      color: var(--editor-line-number-active-color);
+      background: var(--editor-line-number-active-bg);
+      border-radius: 4px;
+    }
+
+    #lineNumbers .line-number:hover {
+      color: var(--editor-line-number-active-color);
+      background: var(--editor-line-number-active-bg);
+      cursor: pointer;
+    }
+
+    #currentLineHighlight {
+      position: absolute;
+      left: var(--editor-line-numbers-width);
+      right: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 2;
+      background: var(--editor-line-number-active-bg);
+      border-radius: 4px;
+      user-select: none;
+      box-sizing: border-box;
+    }
+
+    .editor-container textarea,
+    .editor-container pre {
+      position: absolute;
+      top: 0;
+      height: auto;
+      left: 0;
+      width: 100%;
+      margin: 0;
+      padding: 16px 16px 32px 16px;
+      border: 0;
+      outline: none;
+      resize: none;
+      overflow: hidden;
+      white-space: pre;
+      word-wrap: normal;
+      box-sizing: border-box;
+      font: var(--editor-font);
+      tab-size: 4;
+      box-sizing: border-box;
+    }
+
+    .editor-container.show-line-numbers #lineNumbers {
+      display: block;
+    }
+
+    .editor-container #lineNumbers {
+      display: none;
+    }
+
+    .editor-container.show-line-numbers textarea, 
+    .editor-container.show-line-numbers pre {
+      left: var(--editor-line-numbers-width);
+      width: var(--editor-calc-width);
+    }
+
+    .editor-container textarea {
+      z-index: 3;
+      background: transparent;
+      color: transparent;
+      caret-color: var(--editor-text);
+      -webkit-text-fill-color: transparent;
+    }
+
+    .editor-container pre {
+      z-index: 1;
+      pointer-events: none;
+      background: var(--editor-bg) !important;
+    }
+
+    .editor-container pre[class*="language-"],
+    .editor-container code[class*="language-"] {
+      background: var(--editor-bg) !important;
+      color: var(--editor-text);
+      text-shadow: none;
+      font: var(--editor-font);
+      margin: 0;
+    }
+
+    #highlighting {
+      display: block;
+      min-height: 100%;
+      line-height: var(--editor-line-height);
+    }
+
+    .resizer {
+      width: 10px;
+      flex: 0 0 10px;
+      cursor: col-resize;
+      background: linear-gradient(to right, transparent 0, transparent 3px, var(--handle) 3px, var(--handle) 7px, transparent 7px);
+      user-select: none;
+    }
+
+    .editor-pane {
+      width: 60%;
+      min-width: var(--min-editor-width);
+      color: var(--shell-text);
+    }
+
+    .shell-pane {
+      width: 40%;
+      min-width: var(--min-shell-width);
+      color: var(--shell-text);
+    }
+
+    .shell-pane .pane-header {
+      background: #111827;
+      border-bottom-color: var(--shell-border);
+      color: var(--shell-text);
+    }
+
+    .shell-body {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    #output {
+      flex: 1;
+      background: #020617;
+      border: 1px solid var(--shell-border);
+      border-radius: 10px;
+
+      padding: 12px;
+      font: 15px/1.5 Consolas, "Courier New", monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow: auto;
+    }
+
+    .line { margin-bottom: 1pt; }
+    .line.result { color: #e5e7eb; }
+    .line.log { color: #c7d2fe; }
+    .line.error { color: #fca5a5; }
+    .line.info { color: var(--shell-muted); }
+    .line.alert { color: red }
+    .line.input { color: var(--shell-prompt); }
+    
+    .shell-input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--shell-input);
+      border: 1px solid var(--shell-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: 15px Consolas, "Courier New", monospace;
+    }
+
+    .shell-input-row button {
+      border: 1px solid var(--shell-border);
+      color: var(--button-text);
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: var(--control-radius); 
+    }
+
+    .shell-input-row button:hover {
+      background-color: var(--shell-prompt);
+    }
+
+    #shellInput {
+      flex: 1;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--shell-text);
+      font: inherit;
+    }
+
+    #sandbox {
+      display: none;
+    }
+
+    #shellPrompt { 
+      color: var(--shell-prompt); 
+      user-select: none; 
+      background-color: transparent;
+    }
+
+    .normal {
+      animation: none;
+      opacity: 1;
+    }
+
+    .pulse {
+      animation: pulse 1s infinite alternate;
+      opacity: 1;
+    }
+
+    @keyframes blink {
+      from, to {
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes pulse {
+      from {
+        box-shadow: 0 0 10px;
+        opacity: 0.75;
+      }
+      to {
+        box-shadow: 0 0 40px;
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-title">From Curiosity to Code</div>
+    <div class="app-subtitle">JavaScript IDE v1.0</div>
+  </header>
+
+  <main class="workspace" id="workspace">
+    <section class="pane editor-pane" id="editorPane">
+      <div class="pane-header">
+        <div class="pane-title">Editor</div>
+        <div class="toolbar">
+          <div class="control">
+            <button id="undoBtn" title="Undo">&#x21BA;</button>
+            <button id="redoBtn" title="Redo">&#x21BB;</button>
+            <button id="outdentBtn" title="Outdent">&larrb;</button>
+            <button id="insertTabBtn" title="Insert Tab">&rarrb;</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="wrapSelectionBtn" hidden>Wrap log()</button>
+          <button id="formatCodeBtn" title="Format Code">Format</button>
+          <button id="clearCodeBtn" class="danger" title="Clear Code">Clear</button>
+        </div>
+      </div>
+      <div class="editor-wrap">
+        <div id="editorContainer" class="editor-container show-line-numbers">
+          <button id="toggleLineNumbersBtn" title="Toggle Line Numbers">&#9668;</button>
+          <div id="lineNumbers"></div>
+          <div id="currentLineHighlight" aria-hidden="true"></div>
+          <pre aria-hidden="true"><code id="highlighting" class="language-javascript"></code></pre>
+          <textarea id="editor" spellcheck="false"></textarea>
+        </div>
+      </div>
+      <div class="editor-footer">
+        <div class="toolbar">
+          <div class="control">
+            <b>File:&nbsp;</b><input id="fileNameInput" type="text" value="" placeholder="Enter filename"/>
+          </div>
+          <button id="saveCodeBtn" title="Save code to downloads folder">Save</button>
+          <button id="loadCodeBtn" title="Load code from downloads folder">Load</button>
+          <button id="resetCodeBtn" title="Reset to example code">Reset Example</button>
+        </div>
+        <div class="toolbar">
+          <button id="runCodeBtn" class="primary" title="Run code in shell">RUN</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="resizer" id="resizer" aria-hidden="true"></div>
+
+    <section class="pane shell-pane" id="shellPane">
+      <div class="pane-header">
+        <div class="pane-title">Shell</div>
+        <div class="toolbar">
+          <button id="clearShellBtn" title="Clear Console">Clear</button>
+          <button id="resetShellBtn" title="Reset Shell">Reset</button>
+        </div>
+      </div>
+      <div class="shell-body">
+        <div id="output" aria-live="polite"></div>
+        <div class="shell-input-row">
+          <span id="shellPrompt" class="normal">&gt;&gt;&gt;</span>
+          <input id="shellInput" type="text" autocomplete="off" spellcheck="false" />
+          <button id="shellInputCancelBtn" hidden title="Cancel input prompt">Cancel</button>
+        </div>
+      </div>
+    </section>
+    <iframe id="sandbox" title="sandbox"></iframe>
+    <input id="loadCodeInput" type="file" accept=".js,text/javascript" style="display:none;" />
+  </main>
+
+<div style="display:none;">
+<code id="exampleCode" class="language-javascript">/*
+  Sample JavaScript code to get you started
+*/
+let name = prompt("What is your name?");
+console.log("Hello, " + name + "!");
+</code>
+<span id="js-input-placeholder">Type script here and press Enter</span>
+<span id="input-placeholder">Enter input here (Ctrl+C to Cancel)</span>
+<span id="shell-resetted-message">Shell resetted. Variables and state were cleared.</span>
+<span id="shell-cleared-message">JavaScript shell ready.</span>
+<pre id="sand-box-document">
+&lt;!DOCTYPE html>
+&lt;html>
+  &lt;head>
+    &lt;title>Sandbox&lt;/title>
+  &lt;/head>
+  &lt;script&gt;
+    class Graphics {
+      constructor(window, width, height) {
+        this.window = window;
+        this.canvas = window.document.createElement('canvas');
+        this.canvas.width = width;
+        this.canvas.height = height;
+
+        window.document.body.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext('2d');
+      }
+    }
+    
+    Graphics.random = function random(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+    
+  &lt;/script&gt;
+  &lt;body>
+  &lt;/body>
+&lt;/html>
+</pre>
+</div>
+
+  <script>
+    (function () {
+      const editorContainer = document.getElementById("editorContainer");
+      const editor = document.getElementById('editor');
+      const highlighting = document.getElementById('highlighting');
+      const output = document.getElementById('output');
+      const shellInput = document.getElementById('shellInput');
+      const shellInputCancelBtn = document.getElementById('shellInputCancelBtn');
+      const runCodeBtn = document.getElementById('runCodeBtn');
+      const resetCodeBtn = document.getElementById('resetCodeBtn');
+      const clearCodeBtn = document.getElementById('clearCodeBtn');
+      const saveCodeBtn = document.getElementById('saveCodeBtn');
+      const loadCodeBtn = document.getElementById('loadCodeBtn');
+      const loadCodeInput = document.getElementById('loadCodeInput');
+      const fileNameInput = document.getElementById('fileNameInput');
+      const clearShellBtn = document.getElementById('clearShellBtn');
+      const formatCodeBtn = document.getElementById('formatCodeBtn');
+      const resetShellBtn = document.getElementById('resetShellBtn');
+      const undoBtn = document.getElementById('undoBtn');
+      const redoBtn = document.getElementById('redoBtn');
+      const insertTabBtn = document.getElementById('insertTabBtn');
+      const outdentBtn = document.getElementById('outdentBtn');
+      const wrapSelectionBtn = document.getElementById('wrapSelectionBtn');
+      const toggleLineNumbersBtn = document.getElementById('toggleLineNumbersBtn');
+
+      const workspace = document.getElementById('workspace');
+      const editorPane = document.getElementById('editorPane');
+      const shellPane = document.getElementById('shellPane');
+      const resizer = document.getElementById('resizer');
+      const shellPrompt = document.getElementById('shellPrompt');
+      const lineNumbers = document.getElementById('lineNumbers');
+      const currentLineHighlight = document.getElementById('currentLineHighlight');
+
+      const exampleCodeContent  = document.getElementById('exampleCode').textContent;
+      const jsInputPlaceholderContent = document.getElementById('js-input-placeholder').textContent;
+      const inputPlaceholderContent = document.getElementById('input-placeholder').textContent;
+      const sandBoxDocumentContent = document.getElementById('sand-box-document').textContent;
+      const shellResettedMessage = document.getElementById('shell-resetted-message').textContent;
+      const shellClearedMessage = document.getElementById('shell-cleared-message').textContent;
+      
+      const shellHistory = [];
+      let historyIndex = -1;
+      let isResizing = false;
+      let sandboxWindow = null;
+      let ignoreEditorInput = false;
+      let showLineNumbers = true;
+
+      const undoStack = [];
+      const redoStack = [];
+      let lastSnapshot = null;
+
+      function syncEditorLayout() {
+        editor.style.height = 'auto';
+        editor.style.width = 'auto';
+
+        const contentHeight = Math.max(
+          editorContainer.clientHeight,
+          editor.scrollHeight
+        );
+        const contentWidth = Math.max(
+          editorContainer.clientWidth - (showLineNumbers ? lineNumbers.offsetWidth : 0),
+          editor.scrollWidth
+        );
+        editor.style.height = contentHeight + 'px';
+        editor.style.width = contentWidth + 'px';
+        lineNumbers.style.height = contentHeight + "px";
+      }
+
+      function updateLineNumbers() {
+        if (showLineNumbers) {
+          const lines = editor.value.split('\n');
+          let html = []
+          index = 0;
+          for (let i = 0; i < lines.length; i++) {
+            html.push(`<div class=line-number data-line='${i+1}' data-index='${index}'>${i+1}</div>`);
+            index += lines[i].length + 1;
+          }
+          lineNumbers.innerHTML = html.join('');
+        } else {
+          lineNumbers.innerHTML = '';
+        }
+        updateCurrentLineHighlight();
+      }
+
+      function updateHighlight() {
+        let code = editor.value || " ";
+        highlighting.textContent = code;
+        Prism.highlightElement(highlighting);
+        updateLineNumbers();
+        requestAnimationFrame(syncEditorLayout);
+      }
+
+      function updateCurrentLineHighlight() {
+        const lineNumber = editor.getCurrentPosition().line;
+        const line = updateActiveLineNumber(lineNumber);
+        
+        if (line) {
+          currentLineHighlight.style.display = 'block';
+          currentLineHighlight.style.top = line.offsetTop + 'px';
+          currentLineHighlight.style.height = line.offsetHeight + 'px';
+        } else {
+          currentLineHighlight.style.display = 'none';
+        }
+      }
+
+      function updateActiveLineNumber(lineNumber) {
+        const active = lineNumbers.querySelector('.line-number.active');
+        if (active) active.classList.remove('active');
+
+        const next = lineNumbers.querySelector(`[data-line=\"${lineNumber}\"]`);
+        if (next) next.classList.add('active');
+        return next;
+      }
+
+      function getIndexFromLine(lineNumber) {
+        let index = 0;
+        let currentLine = 1;
+
+        while (currentLine < lineNumber && index < editor.value.length) {
+          if (editor.value[index] === '\n') {
+            currentLine++;
+          }
+          index++;
+        }
+
+        return index;
+      }
+
+      function moveCaretToLine(line) {
+        const index = Number(line.dataset.index);
+
+        editor.selectionStart = index;
+        editor.selectionEnd = index;
+        editor.focus();
+
+        updateCurrentLineHighlight();
+      }
+
+      function appendLine(text, className) {
+        const line = document.createElement('div');
+        line.className = 'line ' + (className || 'result');
+        line.textContent = String(text);
+        output.appendChild(line);
+        output.scrollTop = output.scrollHeight;
+        return line
+      }
+
+      function appendInput(text, className) {
+        return appendLine(`${shellPrompt.textContent} ${text}`, className || 'input');
+      }
+
+      function stringifyValue(value) {
+        if (typeof value === 'undefined') return 'undefined';
+        if (value === null) return 'null';
+        if (typeof value === 'string') return value;
+        try {
+          return JSON.stringify(value);
+        } catch (error) {
+          return String(value);
+        }
+      }
+
+      function updateUndoRedoButtons() {
+        undoBtn.disabled = undoStack.length === 0;
+        redoBtn.disabled = redoStack.length === 0;
+      }
+
+      function setEditorValue(value) {
+        const snapshot = typeof value === 'object' && value.value !== undefined ? value 
+          : { value: String(value), selectionStart: 0, selectionEnd: 0, scrollTop: 0 }; 
+        ignoreEditorInput = true;
+        editor.value = snapshot.value;
+        editor.selectionStart = snapshot.selectionStart;
+        editor.selectionEnd = snapshot.selectionEnd;
+        editorContainer.scrollTop = snapshot.scrollTop;
+        editor.undoPosition = {selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd};
+        ignoreEditorInput = false;
+        lastSnapshot = getSnapshot();
+        updateHighlight();
+      }
+
+      function pushUndoSnapshot(previousValue) {
+        if (undoStack.length === 0 || undoStack[undoStack.length - 1].value !== previousValue.value) {
+          undoStack.push(previousValue);
+          if (undoStack.length > 200) {
+            undoStack.shift();
+          }
+        }
+        redoStack.length = 0;
+        updateUndoRedoButtons();
+      }
+
+      function getSnapshot(undoPosition) {
+        return {
+          value: editor.value,
+          selectionStart: undoPosition ? editor.undoPosition.selectionStart : editor.selectionStart,
+          selectionEnd: undoPosition ? editor.undoPosition.selectionEnd : editor.selectionEnd,
+          scrollTop: editorContainer.scrollTop
+        };
+      }
+
+      function initializeEditorHistory() {
+        undoStack.length = 0;
+        redoStack.length = 0;
+        lastSnapshot = getSnapshot();
+        updateUndoRedoButtons();
+      }
+
+      function applyEditorTransform(transformFn) {
+        const before = getSnapshot();
+        transformFn();
+        const after = getSnapshot();
+        if (after.value !== before.value) {
+          pushUndoSnapshot(before);
+          lastSnapshot = after;
+          updateHighlight();
+        }
+        editor.focus();
+      }
+
+      function undoEdit() {
+        if (undoStack.length === 0) return;
+        const current = getSnapshot();
+        const previous = undoStack.pop();
+        redoStack.push(current);
+        setEditorValue(previous);
+        updateUndoRedoButtons();
+        editor.focus();
+      }
+
+      function redoEdit() {
+        if (redoStack.length === 0) return;
+        const current = getSnapshot(true);
+        const next = redoStack.pop();
+        undoStack.push(current);
+        setEditorValue(next);
+        updateUndoRedoButtons();
+        editor.focus();
+      }
+
+      function clearShell(printReady) {
+        output.innerHTML = '';
+
+        if (printReady !== false) {
+          appendLine(shellClearedMessage, 'info');
+        }
+      }
+
+      function clearInput(input) {
+        const resolve = shellInput.pendingInputResolver;
+        shellInput.pendingInputResolver = null;
+
+        if (resolve) {
+          resolve(input);
+        }
+
+        if (shellPrompt.inputLine) {
+          shellPrompt.inputLine.className = 'line input';
+          shellPrompt.inputLine = null;
+        }
+        shellPrompt.className = 'normal';
+        shellInput.pendingInputResolver = null;
+        shellInput.value = '';
+        shellInput.disabled = false;
+        shellInput.placeholder = jsInputPlaceholderContent;
+        shellInputCancelBtn.hidden = true;
+        shellInput.focus();
+      }
+
+      function resetShell() {
+        clearInput()
+        clearShell();
+        createSandbox();
+        appendLine(shellResettedMessage, 'info');
+      }
+
+      function createSandbox() {
+        const oldFrame = document.getElementById('sandbox');
+        const newFrame = oldFrame.cloneNode(false);
+        oldFrame.parentNode.replaceChild(newFrame, oldFrame);
+
+        sandboxWindow = newFrame.contentWindow;
+        const sandboxDocument = sandboxWindow.document;
+        sandboxDocument.open();
+        sandboxDocument.write(sandBoxDocumentContent);
+        sandboxDocument.close();
+
+        oldFrame.appendLine = null;
+        oldFrame.clearInput = null;
+        oldFrame.appendInput = null;
+
+        newFrame.appendLine = appendLine;
+        newFrame.clearInput = clearInput;
+        newFrame.appendInput = appendInput;
+
+        sandboxWindow.console = {
+          log: function () {
+            const args = Array.from(arguments).map(stringifyValue);
+            newFrame.appendLine(args.join(' '), 'log');
+          },
+          error: function () {
+            const args = Array.from(arguments).map(stringifyValue);
+            newFrame.appendLine(args.join(' '), 'error');
+          },
+          warn: function () {
+            const args = Array.from(arguments).map(stringifyValue);
+            newFrame.appendLine(args.join(' '), 'info');
+          },
+          info: function () {
+            const args = Array.from(arguments).map(stringifyValue);
+            newFrame.appendLine(args.join(' '), 'info');
+          },
+          debug: function () {
+            const args = Array.from(arguments).map(stringifyValue);
+            newFrame.appendLine(args.join(' '), 'info');
+          }
+        };
+
+        sandboxWindow.alert = function (message) {
+          window.alert(message);
+          newFrame.appendLine(message, "alert");
+        };
+
+        sandboxWindow.prompt = function (message, defaultValue) {
+            const result = window.prompt(message, defaultValue);
+
+            // Log the interaction to the shell
+            if (message !== undefined) {
+              newFrame.appendLine(message, "input");
+            }
+            if (result === null) {
+              newFrame.appendInput("<Cancel>", "alert");
+            } else {
+              newFrame.appendInput(result);
+            }
+            return result;
+        };
+
+        sandboxWindow.input = function (message) {
+            let line = newFrame.appendLine(message, 'input pulse');
+            newFrame.clearInput();
+
+            return new Promise((resolve) => {
+              shellPrompt.className = 'pulse';
+              shellPrompt.inputLine = line;
+              shellInput.pendingInputResolver = resolve;
+              shellInput.placeholder = inputPlaceholderContent;
+              shellInputCancelBtn.hidden = false;
+            });
+        };
+
+        newFrame.loadedScripts = new Set();
+
+        sandboxWindow.include = async function (fileName) {
+          if (!fileName) {
+            throw new Error('Missing filename argument.');
+          }
+
+          if (newFrame.loadedScripts.has(fileName)) return;
+
+          const script = sandboxDocument.createElement("script");
+          const source = localStorage.getItem(fileName);
+
+          if (source) {
+              const blob = new Blob([source], { type: "text/javascript" });
+              script.src = URL.createObjectURL(blob);
+          } else {
+              script.src = fileName;
+          }
+
+          await new Promise((resolve, reject) => {
+            script.onload = () => {
+              newFrame.loadedScripts.add(fileName);
+              if (source) {
+                URL.revokeObjectURL(script.src);
+              }
+              resolve();
+            };
+
+            script.onerror = () => {
+              sandboxDocument.head.removeChild(script);
+              if (source) {
+                URL.revokeObjectURL(script.src);
+              }
+              reject(new Error(`Failed to load script file '${fileName}'.`));
+            };
+
+            sandboxDocument.head.appendChild(script);
+          });
+
+        };        
+        runCodeBtn.disabled = false;
+      }
+
+      function shouldDisplayResult(result) {
+        return typeof result !== 'undefined';
+      }
+
+      async function runCode(code, options, completionCallback) {
+        const settings = options || {};
+        const echoInput = !!settings.echoInput;
+        const showResult = settings.showResult !== false;
+
+        if (!code || !code.trim()) return;
+        if (echoInput) appendInput(code);
+
+        let sandbox = sandboxWindow;
+        let completed = false;
+        try {
+          const result = await evalCode(code.trim(), options);
+          completed = sandbox === sandboxWindow;
+          if (completed) {
+            if (showResult && shouldDisplayResult(result)) {
+              appendLine(stringifyValue(result), 'result');
+            }
+          }
+        } catch (error) {
+          completed = sandbox === sandboxWindow;
+          if (completed) {
+            appendLine(error.name + ': ' + error.message, 'error');
+          } 
+        } finally {
+          if (completionCallback) {
+            completionCallback(completed);
+          }
+        }
+      }
+
+      async function evalCode(code, options) {
+        if (options.showResult && !(code.startsWith('await ') || code.includes(' await '))) {
+          return sandboxWindow.eval(code);
+        }
+        let asyncWrapper  = `(async function() {\n${code}\n})()`;
+        return await sandboxWindow.eval(asyncWrapper);
+      }  
+
+      function insertAroundSelection(before, after) {
+        applyEditorTransform(function () {
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          const selected = editor.value.slice(start, end);
+          editor.setRangeText(before + selected + after, start, end, 'end');
+        });
+      }
+
+      function indentSelection() {
+        applyEditorTransform(function () {
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          const value = editor.value;
+          const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+          const selected = value.slice(lineStart, end);
+          const updated = selected.replace(/^/gm, '    ');
+          editor.setRangeText(updated, lineStart, end, 'select');
+        });
+      }
+
+      function outdentSelection() {
+        applyEditorTransform(function () {
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+          const value = editor.value;
+          const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+          const selected = value.slice(lineStart, end);
+          const updated = selected.replace(/^ {1,4}/gm, '');
+          editor.setRangeText(updated, lineStart, end, 'select');
+        });
+      }
+
+      function resetExample() {
+        setEditorValue(exampleCodeContent);
+        updateUndoRedoButtons();
+        fileNameInput.value = 'example.js';
+      } 
+
+      editor.getCurrentPosition = function () {
+        const before = this.value.slice(0, this.selectionStart);
+        const lines = before.split('\n');
+
+        return {
+          line: lines.length,
+          column: lines[lines.length - 1].length + 1
+        };
+      }
+
+      window.addEventListener('resize', syncEditorLayout);
+
+      editor.addEventListener('click', updateCurrentLineHighlight);
+
+      editor.addEventListener('keyup', function (event) {
+        updateCurrentLineHighlight();
+        lastSnapshot.selectionEnd = this.selectionEnd;
+        lastSnapshot.selectionStart = this.selectionStart;
+      });
+
+      editor.addEventListener('mouseup', function (event) {
+        lastSnapshot.selectionEnd = this.selectionEnd;
+        lastSnapshot.selectionStart = this.selectionStart;
+      });
+
+      
+      editor.addEventListener('input', function () {
+        if (ignoreEditorInput) return;
+        const current = getSnapshot();
+        if (current.value !== lastSnapshot.value) {
+          pushUndoSnapshot(lastSnapshot);
+          lastSnapshot = current;
+        }
+        updateHighlight();
+      });
+
+      editor.addEventListener('keydown', function (event) {
+        if ((event.ctrlKey || event.metaKey) && !event.shiftKey && event.key.toLowerCase() === 'z') {
+          event.preventDefault();
+          undoEdit();
+          return;
+        }
+
+        if (((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') ||
+            ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'z')) {
+          event.preventDefault();
+          redoEdit();
+          return;
+        }
+
+        if (event.key === 'Tab') {
+          event.preventDefault();
+          applyEditorTransform(function () {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            editor.setRangeText('    ', start, end, 'end');
+          });
+        }
+      });
+
+      lineNumbers.addEventListener('click', function (event) {
+        const target = event.target;
+
+        if (!target.classList.contains('line-number')) return;
+        moveCaretToLine(target);
+      });
+
+      shellInput.handleInput = async function(input) {
+        if (input === undefined) {
+          input = this.value;
+        }
+        if (this.pendingInputResolver) {
+          this.value = '';
+          if (input === null) {
+            appendInput('<Cancel>', 'alert');
+          } else {
+            appendInput(input);
+          }
+          clearInput(input);
+        } else if (input !== null) {
+          this.value = '';
+          if (!input.trim()) return;
+          shellHistory.push(input);
+          historyIndex = shellHistory.length;
+          await runCode(input, { echoInput: true, showResult: true });
+        }
+        /* If input is null, it means Ctrl+C was pressed without a pending input.
+            In this case, we let the default behavior occur. */
+      }
+
+      shellInput.addEventListener('keydown', async function (event) {
+        if (event.key === 'c' && event.ctrlKey) {
+          if (this.pendingInputResolver) {
+            event.preventDefault();
+            await this.handleInput(null);
+          }
+        } else if (event.key === 'Enter') {
+          await this.handleInput();
+        } else if (event.key === 'ArrowUp') {
+          if (!shellHistory.length) return;
+          event.preventDefault();
+          historyIndex = Math.max(0, historyIndex - 1);
+          shellInput.value = shellHistory[historyIndex] || '';
+        } else if (event.key === 'ArrowDown') {
+          if (!shellHistory.length) return;
+          event.preventDefault();
+          historyIndex = Math.min(shellHistory.length, historyIndex + 1);
+          this.value = historyIndex < shellHistory.length ? shellHistory[historyIndex] : '';
+        }
+      });
+
+      shellInputCancelBtn.addEventListener('click', async function () {
+        await shellInput.handleInput(null);
+        clearInput();
+      });
+
+      runCodeBtn.addEventListener('click', async function () {
+        const fileName = fileNameInput.value.trim() || 'editor code';        
+        appendLine(`======= Running ${fileName} =======`, 'info');
+        clearInput();
+        this.disabled = true;
+
+        await runCode(editor.value, { showResult: false }, (completed) => {
+          this.disabled = false;
+          clearInput();
+          
+          if (completed) {
+            appendLine(`======= Finished ${fileName} =======`, 'info');
+          }
+        });
+      });
+
+      resetCodeBtn.addEventListener('click', function () {
+        if (editor.value !== exampleCodeContent) {
+          pushUndoSnapshot(getSnapshot());
+          resetExample();
+        }
+        editor.focus();
+      });
+
+      clearCodeBtn.addEventListener('click', function () {
+        if (editor.value !== '') {
+          pushUndoSnapshot(getSnapshot());
+          setEditorValue('');
+        }
+        editor.focus();
+      });
+
+      saveCodeBtn.addEventListener('click', function () {
+        const fileName = fileNameInput.value.trim() || 'script.js';
+        const blob = new Blob([editor.value], { type: 'text/javascript' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName.endsWith('.js') ? fileName : fileName + '.js';
+        fileNameInput.value = link.download;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+        editor.focus();
+      });
+
+      loadCodeBtn.addEventListener('click', function () {
+        loadCodeInput.click();
+      });
+
+      loadCodeInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const newCode = e.target.result;
+          if (editor.value !== newCode) {
+            setEditorValue(newCode);
+            initializeEditorHistory();
+          }
+          fileNameInput.value = file.name;
+          editor.focus();
+        };
+
+        reader.readAsText(file);
+        loadCodeInput.value = '';
+      });
+
+      formatCodeBtn.addEventListener('click', async function () {
+        try {
+          const formatted = await prettier.format(editor.value, {
+            parser: 'babel',
+            plugins: prettierPlugins,
+            semi: true,
+            singleQuote: false,
+            tabWidth: 4
+          });
+
+          if (editor.value != formatted) {
+            pushUndoSnapshot(getSnapshot());
+            setEditorValue({value: formatted, selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd});
+          }
+        } catch (err) {
+          appendLine('Format error: ' + err.message, 'error');
+        }
+        editor.focus();
+      });
+
+      clearShellBtn.addEventListener('click', function () {
+        clearShell(false);
+        shellInput.focus();
+      });
+
+      resetShellBtn.addEventListener('click', resetShell);
+      undoBtn.addEventListener('click', undoEdit);
+      redoBtn.addEventListener('click', redoEdit);
+      insertTabBtn.addEventListener('click', indentSelection);
+      outdentBtn.addEventListener('click', outdentSelection);
+      wrapSelectionBtn.addEventListener('click', function () {
+        insertAroundSelection('console.log(', ');');
+      });
+
+      resizer.addEventListener('mousedown', function () {
+        isResizing = true;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+      });
+
+      window.addEventListener('mousemove', function (event) {
+        if (!isResizing) return;
+        const rect = workspace.getBoundingClientRect();
+        let leftWidth = event.clientX - rect.left;
+        const minWidth = 240;
+        const maxWidth = rect.width - minWidth - resizer.offsetWidth;
+        leftWidth = Math.max(minWidth, Math.min(leftWidth, maxWidth));
+        leftWidthPercentage = Math.floor(leftWidth / rect.width * 100);
+        editorPane.style.width = leftWidthPercentage + '%';
+        shellPane.style.width = (100 - leftWidthPercentage) + '%';
+      });
+
+      window.addEventListener('mouseup', function () {
+        if (!isResizing) return;
+        isResizing = false;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      });
+
+      toggleLineNumbersBtn.addEventListener('click', function () {
+        showLineNumbers = !showLineNumbers;
+        editorContainer.classList.toggle('show-line-numbers', showLineNumbers);
+        toggleLineNumbersBtn.innerHTML = showLineNumbers ? '&#9668;' : '&#9654;';
+        updateLineNumbers();
+        if (showLineNumbers) {
+          editor.focus();
+        }
+      });
+
+      editor.value = exampleCodeContent;
+      initializeEditorHistory();
+      clearShell();
+      createSandbox();
+      resetExample();
+      clearInput();
+    })();
+  </script>
+</body>
+</html>
