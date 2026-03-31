@@ -1114,11 +1114,25 @@ console.log("Hello, " + name + "!");
 
         if (event.key === 'Tab') {
           event.preventDefault();
-          applyEditorTransform(function () {
-            const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            editor.setRangeText('    ', start, end, 'end');
-          });
+          const start = editor.selectionStart;
+          const end = editor.selectionEnd;
+
+          if (start === end) {
+            applyEditorTransform(function () {
+              if (event.shiftKey) {
+                const selected = editor.value.slice(start-4, end);
+                const updated = selected.replace(/ {1,4}$/gm, '');
+                editor.setRangeText(updated, start-4, end, 'end');
+              } else {
+                editor.setRangeText('    ', start, end, 'end');
+                editor.selectionStart = editor.selectionEnd = start + 4;
+              }
+            });
+          } else if (event.shiftKey) {
+            outdentSelection();
+          } else {
+            indentSelection();
+          }
         }
       });
 
@@ -1320,7 +1334,6 @@ console.log("Hello, " + name + "!");
         }
       });
 
-      editor.value = exampleCodeContent;
       initializeEditorHistory();
       clearShell();
       createSandbox();
