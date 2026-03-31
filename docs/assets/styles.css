@@ -9,6 +9,7 @@
   --accent: #8fb4ff;
   --accent-2: #c9a7ff;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+  --backdrop-blur: blur(10px);
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -177,9 +178,10 @@ tr:last-child td { border-bottom: none; }
   position: sticky;
   top: 0;
   z-index: 20;
-  backdrop-filter: blur(10px);
-  background: rgba(7, 9, 18, 0.72);
+  backdrop-filter: var(--backdrop-blur);
+  background: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
 }
 
 .nav-wrap {
