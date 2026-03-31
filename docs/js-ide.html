@@ -15,34 +15,27 @@
 
   <style>
     :root {
-      --bg-url: url("https://codewithintention.github.io/from-curiosity-to-code/assets/book-cover-bg.png");
-      --bg: white;
+      --bg-url: url("assets/book-cover-bg.png");
+
       --panel: transparent;
       --border: #d7dce5;
-      --text: white ;
-      --button-text:var(--editor-bg);
+      --text: white;
       --muted: #dce2ee;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
+      --button-text: #1e1e1e;
+      --button-hover: #c9a7ff;
+      --accent: #c9a7ff;
+      --accent-text: purple;
+      --accent-border: purple;
+      --accent-hover: magenta;
+      --accent-hover-border: white;
+      --accent-hover-text: white;
       --danger: #dc2626;
+      --disabled: #e5e7eb;
+      --handle: #cbd5e1;
+
       --editor-bg: #1e1e1e;
       --editor-border: #2c2c2c;
       --editor-text: #d4d4d4;
-      --shell-bg: #0f172a;
-      --shell-text: #e5e7eb;
-      --shell-muted: #94a3b8;
-      --shell-input: #111827;
-      --shell-prompt: #93c5fd;
-      --shell-border: var(--border);
-      --handle: #cbd5e1;
-      --disabled: #e5e7eb;
-      --min-editor-width: 480px;
-      --min-shell-width: 240px;
-      --control-padding: 4px 8px;
-      --control-radius: 6px;
-      --bg-accent: #8fb4ff;
-      --bg-accent-2: #c9a7ff;
-      --bg-accent-hover: #c9a7ff;
       --editor-font: 15px/1.5 Consolas, "Courier New", monospace;
       --editor-line-height: 1.5;
       --editor-line-numbers-width: 48px;
@@ -50,47 +43,90 @@
       --editor-line-number-active-bg: rgba(255, 255, 255, 0.25);
       --editor-line-number-active-color: #e5e7eb;
       --editor-calc-width: calc(100% - var(--editor-line-numbers-width));
+      --editor-padding: 16px 16px 32px 16px;
+
+      --shell-bg: #0f172a;
+      --shell-text: #e5e7eb;
+      --shell-muted: #94a3b8;
+      --shell-input: #111827;
+      --shell-prompt: #93c5fd;
+      --shell-border: var(--border);
+
+      --min-editor-width: 480px;
+      --min-shell-width: 240px;
+
+      --control-padding: 4px 8px;
+      --control-radius: 6px;
+
+      --backdrop-blur: blur(10px);
     }
 
-    * { box-sizing: border-box; }
-    
-    html, body { height: 100%; margin: 0; font-family: Arial, Helvetica, sans-serif; }
+    * {
+      box-sizing: border-box;
+    }
 
-    body { 
-      display: flex; flex-direction: column; color: var(--text); 
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
       color: var(--button-text);
-      background: var(--bg-url);
+      background-image: var(--bg-url);
       background-size: cover;
-      background-position: top center;
-      background-repeat: no-repeat;
-      background-attachment: fixed; /* desktop */
+      background-attachment: fixed;
+      backdrop-filter: var(--backdrop-blur);
     }
 
     .app-header {
       position: sticky;
       top: 0;
       z-index: 20;
-      backdrop-filter: blur(10px);
       padding: 12px 16px;
       border-bottom: 1px solid var(--border);
       background: var(--panel);
     }
 
-    .app-title { font-size: 18px; font-weight: 700; color: var(--text); }
-    .app-subtitle { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .app-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .app-subtitle {
+      margin-top: 4px;
+      font-size: 18px;
+      color: var(--muted);
+    }
 
     .workspace {
-      flex: 1;
       display: flex;
+      flex: 1;
       overflow: hidden;
     }
 
     .pane {
       display: flex;
       flex-direction: column;
-      min-width: 0px;
+      min-width: 0;
       min-height: 0;
       background: var(--panel);
+    }
+
+    .editor-pane {
+      width: 60%;
+      min-width: var(--min-editor-width);
+      color: var(--shell-text);
+    }
+
+    .shell-pane {
+      width: 40%;
+      min-width: var(--min-shell-width);
+      color: var(--shell-text);
     }
 
     .pane-header {
@@ -103,17 +139,27 @@
       background: var(--panel);
     }
 
-    .pane-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .pane-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
 
     .toolbar {
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
       align-items: center;
+      gap: 8px;
+    }
+
+    .control {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
     }
 
     .editor-footer {
-      color: var(--text);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -121,52 +167,56 @@
       padding: 10px 12px;
       border-top: 1px solid var(--border);
       background: var(--panel);
+      color: var(--text);
     }
 
-    .toolbar .group {
-      display:flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 4px 5px;
-      gap: 8px;
-    }
-
-    .toolbar .control {
-      display:flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      gap: 4px;
+    button,
+    input,
+    label {
+      font-size: 13px;
     }
 
     .toolbar input {
-      padding: var(--control-padding); 
-      border: 1px solid var(--border); 
-      border-radius: var(--control-radius); 
-      font-size: 13px; 
+      padding: var(--control-padding);
+      border: 1px solid var(--border);
+      border-radius: var(--control-radius);
     }
 
-    .toolbar button {
+    .toolbar button,
+    .shell-input-row button {
+      padding: var(--control-padding);
       border: 1px solid var(--border);
+      border-radius: var(--control-radius);
       background: white;
       color: var(--button-text);
-      border-radius: var(--control-radius);
-      padding: var(--control-padding);
-      font-size: 13px;
-      cursor: pointer;
-    }
-    
-    label {
-      font-size: 13px;
       cursor: pointer;
     }
 
-    .toolbar button:hover { border-color: #b9c2d0; background-color: var(--bg-accent-hover);}
-    .toolbar button.primary { background: var(--accent); color: white; border-color: var(--accent); }
-    .toolbar button.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-    .toolbar button.shell:hover { background: var(--bg-accent-hover); border-color: var(--bg-accent-hover); }
-    .toolbar button.danger { color: var(--danger); }
+    .toolbar button:hover,
+    .shell-input-row button:hover {
+      border-color: #b9c2d0;
+    }
+
+    .toolbar button:hover {
+      background-color: var(--button-hover);
+    }
+
+    .toolbar button.primary {
+      color: var(--accent-text);
+      background: var(--accent);
+      border-color: var(--accent-border);
+    }
+
+    .toolbar button.primary:hover {
+      color: var(--accent-hover-text);
+      background: var(--accent-hover);
+      border-color: var(--accent-hover-border);
+    }
+
+    .toolbar button.danger {
+      color: var(--danger);
+    }
+
     .toolbar button:disabled {
       cursor: not-allowed;
       opacity: 0.55;
@@ -185,90 +235,8 @@
       position: relative;
       width: 100%;
       height: 100%;
-      background: var(--editor-bg);
       overflow: auto;
-    }
-
-    .editor-container #toggleLineNumbersBtn {
-      position: sticky;
-      left: 0;
-      top: 0;
-      padding: 0; 
-      border: 0; 
-      border-radius: 0; 
-      background: transparent;
-      color: var(--text);
-      z-index: 4;
-      font-size: 8px;
-    }
-
-    #lineNumbers {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: var(--editor-line-numbers-width);
-      height: 100%;
-      padding: 16px 6px 32px 6px;
-      text-align: right;
-      font: var(--editor-font);
-      white-space: pre;
-      color: var(--editor-line-numbers-color);
       background: var(--editor-bg);
-      border-right: 1px solid var(--editor-text);
-      overflow: hidden;
-      user-select: none;
-      box-sizing: border-box;
-      z-index: 3;
-    }
-
-    #lineNumbers .line-number {
-      height: var(--editor-line-height);
-    }
-
-    #lineNumbers .line-number.active {
-      color: var(--editor-line-number-active-color);
-      background: var(--editor-line-number-active-bg);
-      border-radius: 4px;
-    }
-
-    #lineNumbers .line-number:hover {
-      color: var(--editor-line-number-active-color);
-      background: var(--editor-line-number-active-bg);
-      cursor: pointer;
-    }
-
-    #currentLineHighlight {
-      position: absolute;
-      left: var(--editor-line-numbers-width);
-      right: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 2;
-      background: var(--editor-line-number-active-bg);
-      border-radius: 4px;
-      user-select: none;
-      box-sizing: border-box;
-    }
-
-    .editor-container textarea,
-    .editor-container pre {
-      position: absolute;
-      top: 0;
-      height: auto;
-      left: 0;
-      width: 100%;
-      margin: 0;
-      padding: 16px 16px 32px 16px;
-      border: 0;
-      outline: none;
-      resize: none;
-      overflow: hidden;
-      white-space: pre;
-      word-wrap: normal;
-      box-sizing: border-box;
-      font: var(--editor-font);
-      tab-size: 4;
-      box-sizing: border-box;
     }
 
     .editor-container.show-line-numbers #lineNumbers {
@@ -279,15 +247,93 @@
       display: none;
     }
 
-    .editor-container.show-line-numbers textarea, 
+    .editor-container.show-line-numbers textarea,
     .editor-container.show-line-numbers pre {
       left: var(--editor-line-numbers-width);
       width: var(--editor-calc-width);
     }
 
+    #toggleLineNumbersBtn {
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 4;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--text);
+      font-size: 8px;
+    }
+
+    #lineNumbers {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 3;
+      width: var(--editor-line-numbers-width);
+      height: 100%;
+      padding: var(--editor-padding);
+      overflow: hidden;
+      border-right: 1px solid var(--editor-text);
+      background: var(--editor-bg);
+      color: var(--editor-line-numbers-color);
+      font: var(--editor-font);
+      text-align: right;
+      white-space: pre;
+      user-select: none;
+    }
+
+    #lineNumbers .line-number {
+      height: var(--editor-line-height);
+    }
+
+    #lineNumbers .line-number.active,
+    #lineNumbers .line-number:hover {
+      color: var(--editor-line-number-active-color);
+      background: var(--editor-line-number-active-bg);
+      border-radius: 4px;
+    }
+
+    #lineNumbers .line-number:hover {
+      cursor: pointer;
+    }
+
+    #currentLineHighlight {
+      position: absolute;
+      left: var(--editor-line-numbers-width);
+      right: 0;
+      z-index: 2;
+      overflow: hidden;
+      border-radius: 4px;
+      background: var(--editor-line-number-active-bg);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .editor-container textarea,
+    .editor-container pre {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      padding: var(--editor-padding);
+      overflow: hidden;
+      border: 0;
+      outline: none;
+      resize: none;
+      background: transparent;
+      box-sizing: border-box;
+      white-space: pre;
+      word-wrap: normal;
+      font: var(--editor-font);
+      tab-size: 4;
+    }
+
     .editor-container textarea {
       z-index: 3;
-      background: transparent;
       color: transparent;
       caret-color: var(--editor-text);
       -webkit-text-fill-color: transparent;
@@ -295,17 +341,17 @@
 
     .editor-container pre {
       z-index: 1;
-      pointer-events: none;
       background: var(--editor-bg) !important;
+      pointer-events: none;
     }
 
     .editor-container pre[class*="language-"],
     .editor-container code[class*="language-"] {
+      margin: 0;
       background: var(--editor-bg) !important;
       color: var(--editor-text);
       text-shadow: none;
       font: var(--editor-font);
-      margin: 0;
     }
 
     #highlighting {
@@ -318,79 +364,90 @@
       width: 10px;
       flex: 0 0 10px;
       cursor: col-resize;
-      background: linear-gradient(to right, transparent 0, transparent 3px, var(--handle) 3px, var(--handle) 7px, transparent 7px);
       user-select: none;
-    }
-
-    .editor-pane {
-      width: 60%;
-      min-width: var(--min-editor-width);
-      color: var(--shell-text);
-    }
-
-    .shell-pane {
-      width: 40%;
-      min-width: var(--min-shell-width);
-      color: var(--shell-text);
+      background: linear-gradient(
+        to right,
+        transparent 0,
+        transparent 3px,
+        var(--handle) 3px,
+        var(--handle) 7px,
+        transparent 7px
+      );
     }
 
     .shell-pane .pane-header {
-      background: #111827;
       border-bottom-color: var(--shell-border);
       color: var(--shell-text);
     }
 
     .shell-body {
-      flex: 1;
-      min-height: 0;
       display: flex;
+      flex: 1;
       flex-direction: column;
       gap: 12px;
+      min-height: 0;
       padding: 12px;
     }
 
     #output {
       flex: 1;
-      background: #020617;
+      overflow: auto;
+      padding: 12px;
       border: 1px solid var(--shell-border);
       border-radius: 10px;
-
-      padding: 12px;
+      background: #020617;
       font: 15px/1.5 Consolas, "Courier New", monospace;
       white-space: pre-wrap;
       word-break: break-word;
-      overflow: auto;
     }
 
-    .line { margin-bottom: 1pt; }
-    .line.result { color: #e5e7eb; }
-    .line.log { color: #c7d2fe; }
-    .line.error { color: #fca5a5; }
-    .line.info { color: var(--shell-muted); }
-    .line.alert { color: red }
-    .line.input { color: var(--shell-prompt); }
-    
+    .line {
+      margin-bottom: 1pt;
+    }
+
+    .line.result {
+      color: #e5e7eb;
+    }
+
+    .line.log {
+      color: mediumturquoise;
+    }
+
+    .line.error {
+      color: red;
+    }
+
+    .line.alert {
+      color: #fca5a5;
+    }
+
+    .line.info {
+      color: plum
+    }
+
+    .line.input {
+      color: var(--shell-prompt);
+    }
+
     .shell-input-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      background: var(--shell-input);
+      padding: 10px 12px;
       border: 1px solid var(--shell-border);
       border-radius: 10px;
-      padding: 10px 12px;
+      background: var(--shell-input);
       font: 15px Consolas, "Courier New", monospace;
-    }
-
-    .shell-input-row button {
-      border: 1px solid var(--shell-border);
-      color: var(--button-text);
-      font-size: 12px;
-      cursor: pointer;
-      border-radius: var(--control-radius); 
     }
 
     .shell-input-row button:hover {
       background-color: var(--shell-prompt);
+    }
+
+    #shellPrompt {
+      color: var(--shell-prompt);
+      background-color: transparent;
+      user-select: none;
     }
 
     #shellInput {
@@ -402,43 +459,30 @@
       font: inherit;
     }
 
-    #sandbox {
+    #sandbox,
+    #loadCodeInput,
+    .hidden-assets {
       display: none;
     }
 
-    #shellPrompt { 
-      color: var(--shell-prompt); 
-      user-select: none; 
-      background-color: transparent;
-    }
-
     .normal {
-      animation: none;
       opacity: 1;
+      animation: none;
     }
 
     .pulse {
-      animation: pulse 1s infinite alternate;
       opacity: 1;
+      animation: pulse 1s infinite alternate;
     }
 
-    @keyframes blink {
-      from, to {
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-    }
-    
     @keyframes pulse {
       from {
-        box-shadow: 0 0 10px;
         opacity: 0.75;
+        box-shadow: 0 0 10px;
       }
       to {
-        box-shadow: 0 0 40px;
         opacity: 1;
+        box-shadow: 0 0 40px;
       }
     }
   </style>
@@ -467,6 +511,7 @@
           <button id="clearCodeBtn" class="danger" title="Clear Code">Clear</button>
         </div>
       </div>
+
       <div class="editor-wrap">
         <div id="editorContainer" class="editor-container show-line-numbers">
           <button id="toggleLineNumbersBtn" title="Toggle Line Numbers">&#9668;</button>
@@ -476,10 +521,12 @@
           <textarea id="editor" spellcheck="false"></textarea>
         </div>
       </div>
+
       <div class="editor-footer">
         <div class="toolbar">
           <div class="control">
-            <b>File:&nbsp;</b><input id="fileNameInput" type="text" value="" placeholder="Enter filename"/>
+            <strong>File:&nbsp;</strong>
+            <input id="fileNameInput" type="text" value="" placeholder="Enter filename" />
           </div>
           <button id="saveCodeBtn" title="Save code to downloads folder">Save</button>
           <button id="loadCodeBtn" title="Load code from downloads folder">Load</button>
@@ -510,28 +557,28 @@
         </div>
       </div>
     </section>
+
     <iframe id="sandbox" title="sandbox"></iframe>
-    <input id="loadCodeInput" type="file" accept=".js,text/javascript" style="display:none;" />
+    <input id="loadCodeInput" type="file" accept=".js,text/javascript" />
   </main>
 
-<div style="display:none;">
-<code id="exampleCode" class="language-javascript">/*
+  <div class="hidden-assets" aria-hidden="true">
+    <code id="exampleCode" class="language-javascript">/*
   Sample JavaScript code to get you started
 */
 let name = prompt("What is your name?");
 console.log("Hello, " + name + "!");
-</code>
-<span id="js-input-placeholder">Type script here and press Enter</span>
-<span id="input-placeholder">Enter input here (Ctrl+C to Cancel)</span>
-<span id="shell-resetted-message">Shell resetted. Variables and state were cleared.</span>
-<span id="shell-cleared-message">JavaScript shell ready.</span>
-<pre id="sand-box-document">
-&lt;!DOCTYPE html>
+    </code>
+    <span id="js-input-placeholder">Type script here and press Enter</span>
+    <span id="input-placeholder">Enter input here (Ctrl+C to Cancel)</span>
+    <span id="shell-resetted-message">Shell resetted. Variables and state were cleared.</span>
+    <span id="shell-cleared-message">JavaScript shell ready.</span>
+    <pre id="sand-box-document">&lt;!DOCTYPE html>
 &lt;html>
   &lt;head>
     &lt;title>Sandbox&lt;/title>
   &lt;/head>
-  &lt;script&gt;
+  &lt;script>
     class Graphics {
       constructor(window, width, height) {
         this.window = window;
@@ -543,17 +590,16 @@ console.log("Hello, " + name + "!");
         this.ctx = this.canvas.getContext('2d');
       }
     }
-    
+
     Graphics.random = function random(min, max) {
-        return Math.random() * (max - min) + min;
+      return Math.random() * (max - min) + min;
     }
-    
-  &lt;/script&gt;
+  &lt;/script>
   &lt;body>
   &lt;/body>
 &lt;/html>
 </pre>
-</div>
+  </div>
 
   <script>
     (function () {
@@ -667,20 +713,6 @@ console.log("Hello, " + name + "!");
         const next = lineNumbers.querySelector(`[data-line=\"${lineNumber}\"]`);
         if (next) next.classList.add('active');
         return next;
-      }
-
-      function getIndexFromLine(lineNumber) {
-        let index = 0;
-        let currentLine = 1;
-
-        while (currentLine < lineNumber && index < editor.value.length) {
-          if (editor.value[index] === '\n') {
-            currentLine++;
-          }
-          index++;
-        }
-
-        return index;
       }
 
       function moveCaretToLine(line) {
