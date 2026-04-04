@@ -62,13 +62,11 @@ console.log("Hello, " + name + "!");
   }
 
   function postStickyStatusMessage(text, type = 'info') {
-    let intervalId = null;
     function set(message) {
-      clearInterval(intervalId);
       setStatusMessage(message.text, message.type);
     }
     currentStatusMessage = { text, type, postId: null };
-    intervalId = setInterval(set, 1, currentStatusMessage);
+    setTimeout(set, 1, currentStatusMessage);
   }
 
   function setStatusMessage(text, type = 'info') {
@@ -88,7 +86,7 @@ console.log("Hello, " + name + "!");
   function postStatusMessage(text, type = "info") {
     function clear(message) {
       if (message && message.postId) {
-        clearInterval(message.postId);
+        clearTimeout(message.postId);
         message.postId = null;
       }
       updateStatusMessage(stickyStatusMessage);
@@ -96,7 +94,7 @@ console.log("Hello, " + name + "!");
     clear(currentStatusMessage);
     const message = updateStatusMessage({text, type});
     if (message !== null) {
-      message.postId = setInterval(clear, type === 'error' ? statusMessageErrorDuration : statusMessageNormalDuration, message);
+      message.postId = setTimeout(clear, type === 'error' ? statusMessageErrorDuration : statusMessageNormalDuration, message);
     }
   }
 
@@ -323,7 +321,6 @@ console.log("Hello, " + name + "!");
     const current = getSnapshot();
     const previous = undoStack.pop();
     current.statusMessage = previous.statusMessage;
-    current.stickyStatusMessage = previous.stickyStatusMessage;
     redoStack.push(current);
     setEditorValue(previous);
     updateUndoRedoButtons();
@@ -344,7 +341,6 @@ console.log("Hello, " + name + "!");
     const current = getSnapshot(true);
     const next = redoStack.pop();
     current.statusMessage = next.statusMessage;
-    current.stickyStatusMessage = next.stickyStatusMessage;
     undoStack.push(current);
     setEditorValue(next);
     updateUndoRedoButtons();
@@ -494,7 +490,10 @@ console.log("Hello, " + name + "!");
 
   function resetExample(undoable = false) {
     fileNameInput.value = "example.js";
-    postStickyStatusMessage(undoable ? `Reset code to '${fileNameInput.value}'` : fileNameInput.value, undoable ? "action" : "info");
+    postStickyStatusMessage(fileNameInput.value, "info");
+    if (undoable) {
+      postStatusMessage("Reset to example code.", "action");
+    }
     setEditorValue(exampleCode, undoable);
   }
 
