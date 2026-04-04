@@ -34,7 +34,10 @@ jobs:
           git add docs/downloads/js-ide.zip
 
           if ! git diff --cached --quiet; then
-            msg=$(git log -1 --pretty=%s)
+            msg=$(git log -1 --pretty=%s --no-merges)
+            if [ -z "$msg" ]; then
+              msg=$(git log -1 --pretty=%s)
+            fi
             git commit -m "zip: ${msg}"
             git push
           else
