@@ -1,1 +1,1 @@
-git archive -o docs\js-ide\js-ide.zip HEAD:docs/js-ide
+git archive -o docs\js-ide.zip HEAD:docs/js-ide
