@@ -77,6 +77,8 @@ console.log("Hello, " + name + "!");
   }
 
   function setEditedStatus() {
+    if (!stickyStatusMessage) return;
+    
     const stickyMessageText = stickyStatusMessage && stickyStatusMessage.text || "";
 
     if (stickyMessageText.endsWith("*")) {
