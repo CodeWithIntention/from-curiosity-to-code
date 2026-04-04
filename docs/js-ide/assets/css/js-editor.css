@@ -73,25 +73,26 @@
   overflow: hidden;
 }
 
-#editorStatusBar {
+.editor-status-bar {
   display: flex;
   align-items: center;
+  flex-direction: row;
   padding: 0;
   border-bottom: 1px solid var(--editor-text);
   background: var(--editor-status-bar);
   color: var(--text);
 }
 
-#editorStatusBar .right {
+.editor-status-bar .right {
   width: var(--editor-line-numbers-width);
   border-right: 1px solid var(--editor-text);
 }
 
-#editorStatusBar .right * {
+.editor-status-bar .right * {
   margin: 4px
 }
 
-#editorStatus {
+.editor-status {
   font-size: 13px;
   color: var(--muted);
   top: 0;
@@ -102,23 +103,29 @@
   padding: var(--control-padding);
 }
 
-#editorStatus .error {
+.editor-status .error {
   font-weight: bold;
   color: var(--error);
 }
 
-#editorStatus .info {
+.editor-status .info {
   font-weight: normal;
+  color: var(--info);
 }
 
-#editorStatus .action {
+.editor-status .action {
   font-weight: normal;
   color: var(--action);
 }
 
-#editorStatus .alert {
+.editor-status .alert {
   font-weight: normal;
   color: var(--alert);
+}
+
+.editor-status .sticky {
+  font-weight: bold;
+  color: var(--text);
 }
 
 #findReplaceBar {

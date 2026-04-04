@@ -37,6 +37,8 @@
   const replaceAllBtn = $("replaceAllBtn");
   const closeFindReplaceBtn = $("closeFindReplaceBtn");
   const editorStatus = $("editorStatus");
+  const editorStickyStatus = $("editorStickyStatus");
+
   const exampleCode = `/*
 Sample JavaScript code to get you started
 */
@@ -56,67 +58,76 @@ console.log("Hello, " + name + "!");
   const statusMessageNormalDuration = 3000;
   const statusMessageErrorDuration = 5000;
 
-  function setStatus(message) {
-    const {text, type} = message || {text: null, type: null};
-    setStatusMessage(text, type);
-  }
-
-  function postStickyStatusMessage(text, type = 'info') {
-    function set(message) {
-      setStatusMessage(message.text, message.type);
-    }
-    currentStatusMessage = { text, type, postId: null };
-    setTimeout(set, 1, currentStatusMessage);
-  }
-
-  function setStatusMessage(text, type = 'info') {
-    if (!text) {
-      stickyStatusMessage = null;
+  function setStatus(message, delayed = false) {
+    if (delayed === false) {
       postStatusMessage(null);
+    }
+    if (!(message && message.text)) {
+      stickyStatusMessage = null;
+      lastSnapshot && (lastSnapshot.stickyStatusMessage = null);
+      editorStickyStatus.innerHTML = "";
+      editorStickyStatus.hidden = true;
       return;
     }
+    stickyStatusMessage = message;
+    lastSnapshot && (lastSnapshot.stickyStatusMessage = message);
+    
+    editorStickyStatus.innerHTML = `<span class='${message.type || 'sticky'}'>${message.text}</span>`;
+    editorStickyStatus.hidden = false;
+  }
 
-    stickyStatusMessage = { text, type };
-    postStatusMessage(null);
-    if (!(currentStatusMessage && currentStatusMessage.postId)) {
-      updateStatusMessage(stickyStatusMessage);
+  function setEditedStatus() {
+    const stickyMessageText = stickyStatusMessage && stickyStatusMessage.text || "";
+
+    if (stickyMessageText.endsWith("*")) {
+      postStatusMessage(null);
+    } else {
+      setStatusMessage(stickyMessageText + "*", stickyStatusMessage.type);
     }
+  }
+
+  function postStickyStatusMessage(text, type = 'sticky') {
+    function set(message) {
+      setStatus(message, true);
+    }
+    const message = {text, type};
+    setTimeout(set, 1, message);
+  }
+
+  function setStatusMessage(text, type = "sticky") {
+    setStatus({text, type});
   }
 
   function postStatusMessage(text, type = "info") {
+    function update(message) {
+      if (message && message.text) {
+        currentStatusMessage = message;
+        editorStatus.innerHTML = `<span class='${message.type}'>${message.text}</span>`;
+        editorStatus.hidden = false;
+        lastSnapshot && (lastSnapshot.statusMessage = message);
+        return message;
+      }
+      currentStatusMessage = null;
+      lastSnapshot && (lastSnapshot.statusMessage = null);
+    
+      editorStatus.hidden = true;
+      editorStatus.innerHTML = "";
+      return null;
+    }
+
     function clear(message) {
       if (message && message.postId) {
         clearTimeout(message.postId);
         message.postId = null;
       }
-      updateStatusMessage(stickyStatusMessage);
+      update(null);
     }
+
     clear(currentStatusMessage);
-    const message = updateStatusMessage({text, type});
+    const message = update({text, type});
     if (message !== null) {
       message.postId = setTimeout(clear, type === 'error' ? statusMessageErrorDuration : statusMessageNormalDuration, message);
     }
-  }
-
-  function updateStatusMessage(message) {
-    if (message && message.text) {
-      currentStatusMessage = message;
-      editorStatus.innerHTML = `<span class='${message.type}'>${message.text}</span>`;
-      editorStatus.hidden = false;
-      if (lastSnapshot) {
-        lastSnapshot.statusMessage = message;
-        lastSnapshot.stickyStatusMessage = stickyStatusMessage;
-      }
-      return message;
-    }
-    if (lastSnapshot) {
-      lastSnapshot.statusMessage = null;
-      lastSnapshot.stickyStatusMessage = null;
-    }
-    currentStatusMessage = null;
-    editorStatus.hidden = true;
-    editorStatus.innerHTML = "";
-    return null;
   }
 
   function getSnapshot(useUndoPosition) {
@@ -301,7 +312,7 @@ console.log("Hello, " + name + "!");
 
   function applyEditorTransform(transformFn) {
     const savedStickyStatusMessage = stickyStatusMessage;
-    setStatusMessage(null);
+    setEditedStatus();
 
     const before = getSnapshot();
     transformFn();
@@ -490,9 +501,9 @@ console.log("Hello, " + name + "!");
 
   function resetExample(undoable = false) {
     fileNameInput.value = "example.js";
-    postStickyStatusMessage(fileNameInput.value, "info");
+    postStickyStatusMessage(fileNameInput.value);
     if (undoable) {
-      postStatusMessage("Reset to example code.", "action");
+      postStatusMessage(`Reset to '${fileNameInput.value}'.`, "action");
     }
     setEditorValue(exampleCode, undoable);
   }
@@ -805,7 +816,7 @@ console.log("Hello, " + name + "!");
     const position = editor.getCurrentPosition();
     applyEditorTransform(function () {
       setEditorRangeText(replaceInput.value, position.start, position.end, "select");
-      postStickyStatusMessage(`Replaced "${query}" with "${replaceInput.value}" at line ${position.line}, column ${position.column}.`, "action");
+      postStatusMessage(`Replaced "${query}" with "${replaceInput.value}" at line ${position.line}, column ${position.column}.`, "action");
     });
 
     refreshFindUI();
@@ -828,7 +839,7 @@ console.log("Hello, " + name + "!");
       return;
     }
 
-    postStickyStatusMessage(`Replaced all instances of "${query}" with "${replaceInput.value}".`, "action");
+    postStatusMessage(`Replaced all instances of "${query}" with "${replaceInput.value}".`, "action");
     setEditorValue({
       value: after,
       selectionStart: 0,
@@ -1032,7 +1043,7 @@ console.log("Hello, " + name + "!");
       pushUndoSnapshot(lastSnapshot);
       lastSnapshot = current;
     }
-    setStatusMessage(null);
+    setEditedStatus();
     updateHighlight();
   });
 
@@ -1205,7 +1216,7 @@ console.log("Hello, " + name + "!");
 
   clearCodeBtn.addEventListener("click", function () {
     if (editor.value !== "") {
-      postStickyStatusMessage("Cleared code.", "action");
+      postStatusMessage("Cleared code.", "action");
       setEditorValue("", true);
     }
     editor.focus();
@@ -1233,7 +1244,8 @@ console.log("Hello, " + name + "!");
     document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
-    setStatusMessage(`Code saved as "${link.download}".`, "action");
+    setStatusMessage(link.download);
+    postStatusMessage(`Code saved as "${link.download}".`, "action");
     editor.focus();
   });
 
@@ -1249,7 +1261,7 @@ console.log("Hello, " + name + "!");
     reader.onload = function (e) {
       const newCode = e.target.result;
       if (editor.value !== newCode) {
-        setStatusMessage(file.name, "info");
+        setStatusMessage(file.name);
         setEditorValue(newCode);
         initializeEditorHistory();
       }
