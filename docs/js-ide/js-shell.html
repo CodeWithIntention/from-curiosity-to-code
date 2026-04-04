@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shell</title>
+  <link rel="stylesheet" href="assets/css/js-css.css" />
+  <link rel="stylesheet" href="assets/css/js-shell.css" />  
+</head>
+<body>
+  <section class="page-pane">
+    <div class="pane-header">
+      <div class="pane-title">Shell</div>
+      <div class="toolbar">
+        <button id="clearShellBtn" title="Clear Console">Clear</button>
+        <button id="resetShellBtn" title="Reset Shell">Reset</button>
+      </div>
+    </div>
+
+    <div class="shell-body">
+      <div id="output" aria-live="polite"></div>
+
+      <div class="shell-input-row">
+        <span id="shellPrompt" class="normal">&gt;&gt;&gt;</span>
+        <input id="shellInput" type="text" autocomplete="off" spellcheck="false" />
+        <button id="shellInputCancelBtn" title="Cancel input prompt" hidden>Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <iframe id="sandbox" title="sandbox" hidden></iframe>
+
+  <script src="js-lib.js"></script>
+  <script src="js-shell.js"></script>
+</body>
+</html>

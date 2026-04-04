@@ -1,0 +1,324 @@
+:root {
+  --bg-url: url("../book-cover-bg.png");
+
+  --panel: transparent;
+  --border: #d7dce5;
+  --text: white;
+  --muted: #dce2ee;
+  --button-text: #1e1e1e;
+  --button-border: #b9c2d0;
+  --button-hover: #c9a7ff;
+  --button-hover-border: #c9a7ff;
+  --button-corner-hover: white;
+
+  --accent: #c9a7ff;
+  --accent-text: purple;
+  --accent-border: purple;
+  --accent-hover: magenta;
+  --accent-hover-border: white;
+  --accent-hover-text: white;
+  --danger: #dc2626;
+  --disabled: #e5e7eb;
+  --handle: #cbd5e1;
+  --error: #f87171;
+  --alert: #dc2626;
+  --action: orange;
+
+  --editor-tab-size: 4;
+  --editor-bg: #1e1e1e;
+  --editor-border: #2c2c2c;
+  --editor-text: #d4d4d4;
+  --editor-font: 15px/1.5 Consolas, "Courier New", monospace;
+  --editor-line-height: 1.5;
+  --editor-line-numbers-width: 48px;
+  --editor-line-numbers-color: rgba(107, 114, 128, 0.9);
+  --editor-line-number-active-bg: rgba(255, 255, 255, 0.25);
+  --editor-line-number-active-color: #e5e7eb;
+  --editor-calc-width: calc(100% - var(--editor-line-numbers-width));
+  --editor-padding: 16px 16px 32px 16px;
+  --editor-find-replace-bar: rgba(15, 23, 42, 0.92);
+  --editor-status-bar: rgba(62, 67, 75, 0.92);
+
+  --shell-bg: #0f172a;
+  --shell-text: #e5e7eb;
+  --shell-input: #111827;
+  --shell-prompt: #93c5fd;
+  --shell-border: var(--border);
+
+  --min-editor-width: 480px;
+  --min-shell-width: 240px;
+
+  --control-padding: 4px 8px;
+  --control-radius: 6px;
+
+  --backdrop-blur: blur(10px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  color: var(--button-text);
+  background-image: var(--bg-url);
+  background-size: cover;
+  background-attachment: fixed;
+  backdrop-filter: var(--backdrop-blur);
+}
+
+.app-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between; 
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.app-header nav {
+  display: flex;
+  gap: 12px;
+}
+
+.app-header nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: var(--control-radius);
+}
+
+.app-header nav a:hover{
+  animation: glow 0.5s infinite alternate;
+  color: var(--accent);
+}
+
+.app-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.app-subtitle {
+  margin-top: 4px;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.workspace {
+  display: flex;
+  height: calc(100vh - 76px);
+  overflow: hidden;
+}
+
+.frame-pane {
+  min-width: 0;
+  min-height: 0;
+}
+
+.editor-host {
+  width: 60%;
+  min-width: var(--min-editor-width);
+}
+
+.shell-host {
+  width: 40%;
+  min-width: var(--min-shell-width);
+}
+
+.host-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.resizer {
+  width: 10px;
+  flex: 0 0 10px;
+  cursor: col-resize;
+  user-select: none;
+  background: linear-gradient(
+    to right,
+    transparent 0,
+    transparent 3px,
+    var(--handle) 3px,
+    var(--handle) 7px,
+    transparent 7px
+  );
+}
+
+.page-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--panel);
+}
+
+.pane-header,
+.editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.pane-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.editor-footer {
+  display: flex;
+  align-items: start;
+  border-top: 1px solid var(--border);
+}
+
+.pane-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.toolbar,
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.corner-button {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  padding: 1px;
+  border: 1px solid var(--button-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text);
+  opacity: 0.50;
+  cursor: pointer;
+}
+
+.corner-button:hover {
+  border: 1px solid var(--button-border);
+  background: transparent;
+  opacity: .75;
+  transition: all 0.15s ease;
+}
+
+.corner-button.active:hover {
+  opacity: 1;
+  filter: brightness(1.1);
+}
+
+.corner-button.active {
+  color: var(--text);
+  background-color: transparent;
+  border-color: var(--text);
+  opacity: 1;
+}
+
+button,
+input,
+label {
+  font-size: 13px;
+}
+
+input[type="text"] {
+  padding: var(--control-padding);
+  border: 1px solid var(--border);
+  border-radius: var(--control-radius);
+}
+
+button {
+  padding: var(--control-padding);
+  border: 1px solid var(--border);
+  border-radius: var(--control-radius);
+  background: white;
+  color: var(--button-text);
+  cursor: pointer;
+  border-color: var(--button-border);
+}
+
+button:hover {
+  border-color: var(--button-hover-border);
+  background-color: var(--button-hover);
+}
+
+button.primary {
+  color: var(--accent-text);
+  background: var(--accent);
+  border-color: var(--accent-border);
+}
+
+button.primary:hover {
+  color: var(--accent-hover-text);
+  border-color: var(--accent-hover-border);
+}
+
+button.danger {
+  color: var(--danger);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  border-color: var(--disabled);
+}
+
+button.active {
+  background: var(--accent);
+  border-color: var(--accent-border);
+}
+
+button.active:hover {
+  filter: brightness(1.1);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.normal {
+  opacity: 1;
+  animation: none;
+}
+
+.pulse {
+  opacity: 1;
+  animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    opacity: 0.75;
+    box-shadow: 0 0 10px;
+  }
+  to {
+    opacity: 1;
+    box-shadow: 0 0 40px;
+  }
+}

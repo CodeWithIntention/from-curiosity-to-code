@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor</title>
+
+  <link rel="stylesheet" href="assets/css/js-css.css" />
+  <link rel="stylesheet" href="assets/css/js-editor.css" />
+  <!--https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/-->
+  <link href="vendor/prism/prism-tomorrow.min.css" rel="stylesheet" />
+
+  <!--https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/-->
+  <script src="vendor/prism/prism.min.js"></script>
+  <!--https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/-->
+  <script src="vendor/prism/prism-javascript.min.js"></script>
+
+  <!--https://unpkg.com/prettier@3.3.3/-->
+  <script src="vendor/prettier/standalone.js"></script>
+  <!--https://unpkg.com/prettier@3.3.3/plugins/-->
+  <script src="vendor/prettier/babel.js"></script>
+  <!--https://unpkg.com/prettier@3.3.3/plugins/-->
+  <script src="vendor/prettier/estree.js"></script>
+</head>
+<body>
+  <section class="page-pane">
+    <div class="pane-header">
+      <div class="pane-title">Editor</div>
+
+      <div class="toolbar">
+        <div class="control">
+          <button id="undoBtn" title="Undo">&#x21BA;</button>
+          <button id="redoBtn" title="Redo">&#x21BB;</button>
+          <button id="outdentBtn" title="Outdent">&larrb;</button>
+          <button id="insertTabBtn" title="Insert Tab">&rarrb;</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button id="formatCodeBtn" title="Format Code">Format</button>
+        <button id="clearCodeBtn" class="danger" title="Clear Code">Clear</button>
+      </div>
+    </div>
+
+    <div id="findReplaceBar" hidden>
+      <button id="closeFindReplaceBtn" class="corner-button active" title="Close search bar">&nbsp;×&nbsp;</button>
+      <div class="find-replace-row">
+        <div class="control" style="flex-direction: column; align-items: flex-start;">
+            <div class="control">
+                <input id="findInput" type="text" placeholder="Enter text to find" />
+                <button id="findPrevBtn" title="Previous match">&larr;</button>
+                <button id="findNextBtn" title="Next match">&rarr;</button>
+                <button id="toggleFindMatchCaseBtn" title="Match case">Ab</button>
+            </div>
+        </div>
+        <div class="find-replace control" style="flex-direction: column; align-items: flex-start;">
+            <div class="control">
+                <input id="replaceInput" type="text" placeholder="Enter text to replace" />
+                <button id="replaceBtn" title="Replace current match">&#8644;</button>
+                <button id="replaceAllBtn" title="Replace all matches">&#8644;*</button>
+            </div>
+        </div>
+      </div>
+      <div id="findStatus" class="find-status"></div>
+    </div>
+
+    <div id="editorStatusBar">
+        <div class="right">
+            <button id="toggleLineNumbersBtn" class="corner-button active" title="Toggle Line Numbers">&nbsp;#&nbsp;</button>
+        </div>
+        <div id="editorStatus"></div>
+    </div>
+
+    <div class="editor-wrap">
+      <div id="editorContainer" class="editor-container show-line-numbers">
+        <div id="lineNumbers"></div>
+        <div id="currentLineHighlight" aria-hidden="true"></div>
+        <div id="findHighlights" aria-hidden="true"></div>
+        <pre aria-hidden="true"><code id="highlighting" class="language-javascript"></code></pre>
+        <textarea id="editor" spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <div class="editor-footer">
+        <div class="toolbar">
+            <div class="control">
+                <strong>File:&nbsp;</strong>
+                <input id="fileNameInput" type="text" value="" placeholder="Enter filename" />
+            </div>
+            <button id="saveCodeBtn" title="Save code to downloads folder">Save</button>
+            <button id="loadCodeBtn" title="Load code from downloads folder">Load</button>
+            <button id="resetCodeBtn" title="Reset to example code">Reset Example</button>
+        </div>
+        <div class="toolbar">
+            <button id="runCodeBtn" class="primary" title="Run code in shell">Run</button>
+        </div>
+    </div>
+  </section>
+
+  <input id="loadCodeInput" type="file" accept=".js,text/javascript" hidden/>
+
+  <script src="js-lib.js"></script>
+  <script src="js-editor-ext.js"></script>
+  <script src="js-editor.js"></script>
+</body>
+</html>

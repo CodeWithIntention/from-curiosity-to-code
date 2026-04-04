@@ -1,0 +1,79 @@
+.shell-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 12px;
+}
+
+.shell-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--shell-border);
+  border-radius: 10px;
+  background: var(--shell-input);
+  font: 15px Consolas, "Courier New", monospace;
+}
+
+.shell-input-row button:hover {
+  background-color: var(--shell-prompt);
+}
+
+.line {
+  margin-bottom: 1pt;
+}
+
+.line.result {
+  color: #e5e7eb;
+}
+
+.line.log {
+  color: mediumturquoise;
+}
+
+.line.error {
+  color: var(--error);
+}
+
+.line.alert {
+  color: var(--alert);
+}
+
+.line.info {
+  color: plum;
+}
+
+.line.input {
+  color: var(--shell-prompt);
+}
+
+#output {
+  flex: 1;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--shell-border);
+  border-radius: 10px;
+  background: #020617;
+  color: var(--shell-text);
+  font: 15px/1.5 Consolas, "Courier New", monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#shellPrompt {
+  color: var(--shell-prompt);
+  background-color: transparent;
+  user-select: none;
+}
+
+#shellInput {
+  flex: 1;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--shell-text);
+  font: inherit;
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Curiosity to Code -- JavaScript IDE</title>
+  <link rel="stylesheet" href="assets/css/js-css.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <div class="app-title">From Curiosity to Code</div>
+      <div class="app-subtitle">JavaScript IDE v1.0</div>
+    </div>
+    <nav class="app-nav">
+      <a href="js-help.html">Help</a>
+    </nav>
+  </header>
+
+  <main id="workspace" class="workspace">
+    <section id="editorHost" class="frame-pane editor-host">
+      <iframe
+        id="editorFrame"
+        class="host-frame"
+        src="js-editor.html"
+        title="Editor"
+      ></iframe>
+    </section>
+
+    <div id="resizer" class="resizer" aria-hidden="true"></div>
+
+    <section id="shellHost" class="frame-pane shell-host">
+      <iframe
+        id="shellFrame"
+        class="host-frame"
+        src="js-shell.html"
+        title="Shell"
+      ></iframe>
+    </section>
+  </main>
+
+  <script src="js-lib.js"></script>
+  <script src="js-index.js"></script>
+</body>
+</html>

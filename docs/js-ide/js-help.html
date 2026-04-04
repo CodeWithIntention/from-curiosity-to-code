@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JavaScript IDE Help</title>
+  <link rel="stylesheet" href="assets/css/js-css.css" />
+  <style>
+    body {
+      margin: 0;
+      color: var(--text);
+      background-image: var(--bg-url);
+      background-size: cover;
+      background-attachment: fixed;
+      backdrop-filter: var(--backdrop-blur);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .help-page {
+      min-height: 100vh;
+      background: rgba(15, 23, 42, 0.72);
+    }
+
+    .help-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.82);
+    }
+
+    .help-title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .help-subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 760px;
+    }
+
+    .help-content {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .help-card {
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.88);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .help-card h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      color: var(--text);
+    }
+
+    .help-card p,
+    .help-card li {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .help-card p:last-child,
+    .help-card ul:last-child {
+      margin-bottom: 0;
+    }
+
+    .help-card ul {
+      margin: 10px 0 0 20px;
+      padding: 0;
+    }
+
+    .shortcut-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px 18px;
+      margin-top: 12px;
+    }
+
+    .shortcut {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .shortcut strong {
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .shortcut span {
+      color: var(--muted);
+      font-size: 14px;
+      text-align: right;
+    }
+
+    code {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      padding: 0 24px 24px;
+    }
+  </style>
+</head>
+<body>
+  <main class="help-page">
+    <header class="help-header">
+      <h1 class="help-title">JavaScript IDE Help</h1>
+      <p class="help-subtitle">
+        This editor is designed to stay simple. Write code in the editor, run it in the shell,
+        and use the tools only when they help you move faster.
+      </p>
+    </header>
+
+    <section class="help-content">
+      <article class="help-card">
+        <h2>Getting Started</h2>
+        <ul>
+          <li>Write JavaScript in the editor pane.</li>
+          <li>Select <strong>Run</strong> to execute your code in the shell.</li>
+          <li>Use <strong>Save</strong> to download your file and <strong>Load</strong> to open a saved file.</li>
+          <li>Use <strong>Reset Example</strong> to restore the sample program.</li>
+        </ul>
+      </article>
+
+      <article class="help-card">
+        <h2>Editor Basics</h2>
+        <ul>
+          <li><strong>Undo</strong> and <strong>Redo</strong> step backward and forward through edits.</li>
+          <li><strong>Format</strong> cleans up your code using the built-in formatter.</li>
+          <li><strong>Clear</strong> removes all code from the editor.</li>
+          <li>Press <code>Enter</code> to start a new line. The editor carries forward the current indentation.</li>
+          <li>Press <code>Tab</code> to indent and <code>Shift+Tab</code> to outdent.</li>
+          <li>Use the <code>#</code> button to show or hide line numbers.</li>
+        </ul>
+      </article>
+
+      <article class="help-card">
+        <h2>Find and Replace</h2>
+        <ul>
+          <li>Press <code>Ctrl+F</code> to open Find.</li>
+          <li>Press <code>Ctrl+H</code> to open Replace.</li>
+          <li>Use <code>Enter</code> in the Find box for the next match.</li>
+          <li>Use <code>Shift+Enter</code> in the Find box for the previous match.</li>
+          <li>Use <code>Enter</code> in the Replace box to replace the current match.</li>
+          <li>Use <code>Ctrl+Alt+Enter</code> in the Replace box to replace all matches.</li>
+          <li>The match count appears under the Find and Replace controls.</li>
+        </ul>
+      </article>
+
+      <article class="help-card">
+        <h2>Commenting and Indentation</h2>
+        <ul>
+          <li>Use <code>Ctrl+/</code> to toggle line comments for the current line or selected lines.</li>
+          <li>Comments are added before the first non-space character, so indentation stays intact.</li>
+          <li>Use <code>Ctrl+[</code> to outdent selected lines.</li>
+          <li>Use <code>Ctrl+]</code> to indent selected lines.</li>
+        </ul>
+      </article>
+
+      <article class="help-card">
+        <h2>Running Code</h2>
+        <ul>
+          <li>The shell shows <code>console.log()</code>, <code>console.error()</code>, and other console output.</li>
+          <li><code>prompt()</code> and <code>alert()</code> are supported.</li>
+          <li>Use <code>Reset</code> in the shell to clear variables and start fresh.</li>
+          <li>Use <code>Clear</code> in the shell to clear the console output only.</li>
+        </ul>
+      </article>
+      <article class="help-card">
+        <h2>Keyboard Shortcuts</h2>
+        <div class="shortcut-grid">
+          <div class="shortcut"><strong>Ctrl+F</strong><span>Find</span></div>
+          <div class="shortcut"><strong>Ctrl+H</strong><span>Replace</span></div>
+          <div class="shortcut"><strong>Ctrl+Z</strong><span>Undo</span></div>
+          <div class="shortcut"><strong>Ctrl+Y</strong><span>Redo</span></div>
+          <div class="shortcut"><strong>Ctrl+Shift+Z</strong><span>Redo</span></div>
+          <div class="shortcut"><strong>Ctrl+Shift+K</strong><span>Delete line</span></div>
+          <div class="shortcut"><strong>Ctrl+/</strong><span>Toggle comment</span></div>
+          <div class="shortcut"><strong>Ctrl+[</strong><span>Outdent selection</span></div>
+          <div class="shortcut"><strong>Ctrl+]</strong><span>Indent selection</span></div>
+          <div class="shortcut"><strong>Tab</strong><span>Indent</span></div>
+          <div class="shortcut"><strong>Shift+Tab</strong><span>Outdent</span></div>
+          <div class="shortcut"><strong>Shift+Ctrl+F</strong><span>Format code</span></div>
+          <div class="shortcut"><strong>Escape</strong><span>Close Find/Replace</span></div>
+        </div>
+      </article>
+
+      <article class="help-card">
+        <h2>Tips</h2>
+        <ul>
+          <li>Keep programs small while testing. Run often.</li>
+          <li>If output looks strange, reset the shell and run again.</li>
+          <li>Save your work before trying large formatting or replace-all changes.</li>
+        </ul>
+      </article>
+    </section>
+
+    <div class="footer-note">
+      Open this page locally as <code>js-help.html</code> whenever you want a quick reference.
+    </div>
+  </main>
+</body>
+</html>
+
