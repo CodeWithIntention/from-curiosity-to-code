@@ -3,7 +3,11 @@ name: Build js-ide zip
 on:
   push:
     paths:
+      - '.github/workflows/js-ide-zip.yml'
       - 'docs/js-ide/**'
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -12,23 +16,22 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
-      - name: Create zip
-        run: |
-          cd docs
-          zip -r js-ide.zip js-ide \
-            -x "*.git*" \
-            -x "*node_modules*"
-
-      - name: Move zip to downloads
+      - name: Build zip
         run: |
           mkdir -p docs/downloads
-          mv docs/js-ide.zip docs/downloads/js-ide.zip
+          cd docs
+          rm -f downloads/js-ide.zip
+          zip -r downloads/js-ide.zip js-ide \
+            -x "js-ide/.git/*" \
+            -x "js-ide/**/.DS_Store"
 
-      - name: Commit zip
+      - name: Commit updated zip
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/downloads/js-ide.zip
-          git commit -m "Update js-ide.zip" || echo "No changes"
+          git diff --cached --quiet || git commit -m "Update js-ide.zip"
           git push
