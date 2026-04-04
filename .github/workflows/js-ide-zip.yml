@@ -1,0 +1,34 @@
+name: Build js-ide zip
+
+on:
+  push:
+    paths:
+      - 'docs/js-ide/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Create zip
+        run: |
+          cd docs
+          zip -r js-ide.zip js-ide \
+            -x "*.git*" \
+            -x "*node_modules*"
+
+      - name: Move zip to downloads
+        run: |
+          mkdir -p docs/downloads
+          mv docs/js-ide.zip docs/downloads/js-ide.zip
+
+      - name: Commit zip
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add docs/downloads/js-ide.zip
+          git commit -m "Update js-ide.zip" || echo "No changes"
+          git push
