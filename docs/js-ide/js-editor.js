@@ -368,7 +368,7 @@ console.log("Hello, " + name + "!");
     redoStack.push(current);
     setEditorValue(previous);
     updateUndoRedoButtons();
-
+  
     setStatus(previous.stickyStatusMessage);
 
     let statusMessage = previous.statusMessage || {};
@@ -377,6 +377,7 @@ console.log("Hello, " + name + "!");
     } else {
       postStatusMessage("Undo last edit.", "action");
     }
+    updateEditedStatus();
     editor.focus();
   }
 
@@ -397,6 +398,7 @@ console.log("Hello, " + name + "!");
     } else {
       postStatusMessage("Redo last edit.", "action");
     }
+    updateEditedStatus();
     editor.focus();
   }
 
