@@ -5,6 +5,17 @@
     return document.activeElement === this;
   };
 
+  editor.getLineIndices = function () {
+    const editorValue = this.value;
+    let indices = [0];
+    
+    let index = -1;
+    while ((index = editorValue.indexOf("\n", index + 1)) !== -1) {
+        indices.push(index + 1);
+    }
+    return indices;
+  };
+
   editor.getCurrentPosition = function () {
     const before = this.value.slice(0, this.selectionStart);
     const lines = before.split("\n");

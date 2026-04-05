@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const settings = { tabSize: 4 };
+  const settings = { tabSize: 4, statusMessageNormalDuration: 3000, statusMessageErrorDuration: 5000 };
 
   const { IDE_EVENTS, $, postMessageSafe } = JsIdeLib;
 
@@ -55,8 +55,6 @@ console.log("Hello, " + name + "!");
 
   let currentStatusMessage = null;
   let stickyStatusMessage = null;
-  const statusMessageNormalDuration = 3000;
-  const statusMessageErrorDuration = 5000;
 
   function setStatus(message, delayed = false) {
     if (delayed === false) {
@@ -76,9 +74,23 @@ console.log("Hello, " + name + "!");
     editorStickyStatus.hidden = false;
   }
 
-  function setEditedStatus() {
+  function resetEditor(fileName, code){
+    fileNameInput.value = fileName || "";
+    setStatusMessage(fileNameInput.value || "untitled");
+    setEditorValue(code || "");
+    initializeEditorHistory();
+    editor.focus();
+
+    clearCodeBtn.disabled = fileName || code ? false : true;
+    formatCodeBtn.disabled = code ? false : true;
+  }
+
+  function updateEditedStatus(enableClear = isContentEdited) {
+    clearCodeBtn.disabled = !enableClear;
+    formatCodeBtn.disabled = !editor.value.trim();
+  
     if (!stickyStatusMessage) return;
-    
+
     const stickyMessageText = stickyStatusMessage && stickyStatusMessage.text || "";
 
     if (stickyMessageText.endsWith("*")) {
@@ -86,6 +98,11 @@ console.log("Hello, " + name + "!");
     } else {
       setStatusMessage(stickyMessageText + "*", stickyStatusMessage.type);
     }
+  }
+
+  function isContentEdited() {
+    return (undoStack.length > 0 && undoStack[undoStack.length - 1].value !== editor.value) 
+      || (lastSnapshot && lastSnapshot.value !== editor.value);
   }
 
   function postStickyStatusMessage(text, type = 'sticky') {
@@ -128,7 +145,7 @@ console.log("Hello, " + name + "!");
     clear(currentStatusMessage);
     const message = update({text, type});
     if (message !== null) {
-      message.postId = setTimeout(clear, type === 'error' ? statusMessageErrorDuration : statusMessageNormalDuration, message);
+      message.postId = setTimeout(clear, type === 'error' ? settings.statusMessageErrorDuration : settings.statusMessageNormalDuration, message);
     }
   }
 
@@ -199,22 +216,36 @@ console.log("Hello, " + name + "!");
   function updateLineNumbers() {
     if (!showLineNumbers) {
       lineNumbers.innerHTML = "";
+      lineNumbers.__editorLineCount__ = 0;
       updateCurrentLineHighlight();
       return;
     }
+  
+    const lineIndices = editor.getLineIndices();
+    const updateLineIndicesOnly = lineNumbers.__editorLineCount__ === lineIndices.length;
+    lineNumbers.__editorLineCount__ = lineIndices.length;
 
-    const lines = editor.value.split("\n");
-    let index = 0;
-    const html = [];
+    if (updateLineIndicesOnly) {
+      lineIndices.forEach((lineIndex, i) => {
+        const lineElement = lineNumbers.querySelector(`[data-line="${i + 1}"]`);
+        if (lineElement) {
+          lineElement.dataset.index = lineIndex;
+        }
+      });
+    } else {
+      const lines = editor.value.split("\n");
+      let index = 0;
+      const html = [];
 
-    for (let i = 0; i < lines.length; i += 1) {
-      html.push(
-        `<div class="line-number" data-line="${i + 1}" data-index="${index}">${i + 1}</div>`,
-      );
-      index += lines[i].length + 1;
+      lines.forEach((line, i) => {
+        html.push(
+          `<div class="line-number" data-line="${i + 1}" data-index="${index}">${i + 1}</div>`
+        );
+        index += line.length + 1;
+      });
+
+      lineNumbers.innerHTML = html.join("");
     }
-
-    lineNumbers.innerHTML = html.join("");
     updateCurrentLineHighlight();
   }
 
@@ -314,7 +345,7 @@ console.log("Hello, " + name + "!");
 
   function applyEditorTransform(transformFn) {
     const savedStickyStatusMessage = stickyStatusMessage;
-    setEditedStatus();
+    updateEditedStatus();
 
     const before = getSnapshot();
     transformFn();
@@ -511,7 +542,13 @@ console.log("Hello, " + name + "!");
   }
 
   function sendRunRequest() {
-    const code = editor.value;
+    const code = editor.value.trim();
+    if (!code) {
+      postStatusMessage("Please enter some code before running.", "alert");
+      editor.focus();
+      return;
+    }
+
     const fileName = fileNameInput.value.trim() || "editor code";
 
     postMessageSafe(window.parent, IDE_EVENTS.EDITOR_RUN, {
@@ -1045,7 +1082,7 @@ console.log("Hello, " + name + "!");
       pushUndoSnapshot(lastSnapshot);
       lastSnapshot = current;
     }
-    setEditedStatus();
+    updateEditedStatus();
     updateHighlight();
   });
 
@@ -1123,12 +1160,17 @@ console.log("Hello, " + name + "!");
       return;
     }
 
-    if (event.key === "Enter") {
+    if (event.key === "Enter") {  
+      event.preventDefault();
+
+      if (event.ctrlKey) {
+        sendRunRequest();
+        return;
+      }
+
       const start = editor.selectionStart;
       const end = editor.selectionEnd;
       
-      event.preventDefault();
-
       const selectionLine = editor.getSelectionLines().text;
       const indent = countLeadingSpaces(selectionLine);
       applyEditorTransform(function () {
@@ -1217,11 +1259,11 @@ console.log("Hello, " + name + "!");
   });
 
   clearCodeBtn.addEventListener("click", function () {
-    if (editor.value !== "") {
-      postStatusMessage("Cleared code.", "action");
-      setEditorValue("", true);
+    if (!confirm("Are you sure you want to clear the editor? This action cannot be undone.")) {
+      return;
     }
-    editor.focus();
+    resetEditor();
+    postStatusMessage("Editor cleared.", "action");
   });
 
   resetCodeBtn.addEventListener("click", function () {
@@ -1232,7 +1274,17 @@ console.log("Hello, " + name + "!");
   });
 
   saveCodeBtn.addEventListener("click", function () {
-    const fileName = fileNameInput.value.trim() || "script.js";
+    if (!editor.value.trim()) {
+      alert("Please enter some code before saving.");
+      editor.focus();
+      return;
+    }
+    const fileName = fileNameInput.value.trim();
+    if (!fileName) {
+      alert("Please enter a file name before saving.");
+      fileNameInput.focus();
+      return;
+    }
     const blob = new Blob([editor.value], { type: "text/javascript" });
     const url = URL.createObjectURL(blob);
 
@@ -1262,13 +1314,9 @@ console.log("Hello, " + name + "!");
     const reader = new FileReader();
     reader.onload = function (e) {
       const newCode = e.target.result;
-      if (editor.value !== newCode) {
-        setStatusMessage(file.name);
-        setEditorValue(newCode);
-        initializeEditorHistory();
-      }
-      fileNameInput.value = file.name;
-      editor.focus();
+      resetEditor(file.name, newCode);
+      setStatusMessage(file.name);
+      initializeEditorHistory();
     };
 
     reader.readAsText(file);
@@ -1309,5 +1357,6 @@ console.log("Hello, " + name + "!");
   initializeEditorHistory();
   resetExample();
   refreshFindUI();
+  updateEditedStatus(true);
   postMessageSafe(window.parent, IDE_EVENTS.EDITOR_READY, {});
 })();
