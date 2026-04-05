@@ -1144,6 +1144,18 @@ console.log("Hello, " + name + "!");
       return;
     }
 
+    if ((event.key === "[" && event.ctrlKey) || (this.hasSelection() && event.key === "Tab" && event.shiftKey)) {
+      event.preventDefault();
+      outdentSelection();
+      return;
+    }
+
+    if (event.key === "]" && event.ctrlKey || (this.hasSelection() && event.key === "Tab" && !event.shiftKey)) {
+      event.preventDefault();
+      indentSelection();
+      return;
+    }
+
     if (event.key === "Tab") {
       event.preventDefault();
 
@@ -1178,18 +1190,6 @@ console.log("Hello, " + name + "!");
       applyEditorTransform(function () {
         setEditorRangeText("\n" + selectionLine.substring(0, indent), start, end, "end");
       });
-      return;
-    }
-
-    if (event.key === "[" && event.ctrlKey) {
-      event.preventDefault();
-      outdentSelection();
-      return;
-    }
-
-    if (event.key === "]" && event.ctrlKey) {
-      event.preventDefault();
-      indentSelection();
       return;
     }
 
