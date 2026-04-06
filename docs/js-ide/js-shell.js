@@ -69,6 +69,9 @@
   }
 
   function resetShell() {
+    if (!confirm("Are you sure you want to reset the shell? This will clear all variables and state.")) {
+      return;
+    }
     clearInput();
     clearShell();
     createSandbox();
