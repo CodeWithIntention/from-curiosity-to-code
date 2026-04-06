@@ -181,7 +181,7 @@
     const sourceName = settings.sourceName || sandboxConfig.sourceName;
     const showResult = settings.showResult && !(code.includes("await "));
     const codeLineCount = code.split("\n").length;
-console.log("Running code with sourceName:", codeLineCount);
+
     try {
       let result = undefined;
       if (showResult) {
