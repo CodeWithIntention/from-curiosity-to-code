@@ -12,7 +12,6 @@
     SHELL_RESET: "shell:reset",
     SHELL_RUN_STARTED: "shell:run-started",
     SHELL_RUN_FINISHED: "shell:run-finished",
-    SHELL_RUN_ERROR: "shell:run-error",
 
     SANDBOX_INIT: "sandbox:init",
     SANDBOX_READY: "sandbox:ready",

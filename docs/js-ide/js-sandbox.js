@@ -178,16 +178,14 @@
 
   async function runCode(code, options) {
     const settings = options || {};
-    const sourceName =
-      settings.sourceName || sandboxConfig.sourceName || "js-ide-user-code.js";
-
+    const sourceName = settings.sourceName || sandboxConfig.sourceName;
+    const showResult = settings.showResult && !(code.includes("await "));
+    const codeLineCount = code.split("\n").length;
+console.log("Running code with sourceName:", codeLineCount);
     try {
       let result = undefined;
-      if (
-        settings.showResult &&
-        !(code.startsWith("await ") || code.includes(" await "))
-      ) {
-        result = window.eval(code);
+      if (showResult) {
+        result = window.eval(`\n${code}\n//# sourceURL=${sourceName}`);
         if (result instanceof Promise) {
           result = await result;
         }
@@ -197,13 +195,22 @@
       }
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
         ok: true,
-        result: stringifyValue(result),
+        result: result === undefined ? undefined : stringifyValue(result),
       });
     } catch (error) {
+      let errorMessage = error && error.stack ? error.stack : error.message || String(error);
+      errorMessage = errorMessage.split("at eval (<anonymous>)")[0].split("at runCode")[0].trim();
+      errorMessage = errorMessage.replace(
+        /at (.+) \(([^:]+):(\d+):(\d+)\)/g,
+        (_, func, file, line, col) => {
+          const lineNumber = Math.max(0, parseInt(line, 10)-1);
+          if (lineNumber > codeLineCount) return "..."
+          return `in ${file}:${func} at line ${lineNumber}, column ${col}`;
+        }
+      );
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
         ok: false,
-        error:
-          error && error.stack ? error.stack : error.message || String(error),
+        error: errorMessage,
       });
     }
   }

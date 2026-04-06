@@ -20,8 +20,8 @@
   --danger: #dc2626;
   --disabled: #e5e7eb;
   --handle: #cbd5e1;
-  --error: #f87171;
-  --alert: #dc2626;
+  --error: #ee3535;
+  --alert: rgb(255, 0, 0);
   --action: orange;
   --info: #18d318;
 
@@ -38,7 +38,7 @@
   --editor-calc-width: calc(100% - var(--editor-line-numbers-width));
   --editor-padding: 16px 16px 32px 16px;
   --editor-find-replace-bar: rgba(15, 23, 42, 0.92);
-  --editor-status-bar: rgba(62, 67, 75, 0.92);
+  --editor-status-bar: rgb(85, 81, 84);
 
   --shell-bg: #0f172a;
   --shell-text: #e5e7eb;

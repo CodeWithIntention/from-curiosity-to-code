@@ -48,8 +48,6 @@
     if (event.source !== shellFrame.contentWindow) return;
     const message = event.data || {};
 
-    let isError = false;
-
     switch (message.type) {
       case IDE_EVENTS.SHELL_READY:
         postToEditor(IDE_EVENTS.EDITOR_SET_RUN_STATE, { isRunning: false, isReady: true });
@@ -59,10 +57,8 @@
         postToEditor(IDE_EVENTS.EDITOR_SET_RUN_STATE, { isRunning: true, isStarted: true });
         break;
 
-      case IDE_EVENTS.SHELL_RUN_ERROR:
-        isError = true;
       case IDE_EVENTS.SHELL_RUN_FINISHED:
-        postToEditor(IDE_EVENTS.EDITOR_SET_RUN_STATE, { isRunning: false, isCompleted: true, isError });
+        postToEditor(IDE_EVENTS.EDITOR_SET_RUN_STATE, { isRunning: false, isCompleted: true, error: message.error });
         break;
     }
   }

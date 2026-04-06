@@ -527,6 +527,11 @@ console.log("Hello, " + name + "!");
     moveCaretToSelection(index, index);
   }
 
+  function moveCaretToLineColumn(line, column = 1) {
+    const index = editor.indexFromLineColumn(line - 1) + column - 1;
+    moveCaretToSelection(index, index);
+  }
+
   function moveCaretToSelection(start, end) {
     setEditorSelection(start, end);
     editor.focus();
@@ -544,14 +549,14 @@ console.log("Hello, " + name + "!");
   }
 
   function sendRunRequest() {
-    const code = editor.value.trim();
-    if (!code) {
+    const code = editor.value.trimEnd();
+    if (!code.trim()) {
       postStatusMessage("Please enter some code before running.", "alert");
       editor.focus();
       return;
     }
 
-    const fileName = fileNameInput.value.trim() || "editor code";
+    const fileName = fileNameInput.value.trim() || "Editor code";
 
     postMessageSafe(window.parent, IDE_EVENTS.EDITOR_RUN, {
       code,
@@ -1348,10 +1353,19 @@ console.log("Hello, " + name + "!");
         postStatusMessage("Shell is ready.", "info");
       } else if (message.isStarted) {
         postStatusMessage("Running code...", "action");
-      } else if (message.isError) {
-        postStatusMessage("Error occurred while running code.", "alert");
       } else if (message.isCompleted) {
-        postStatusMessage("Run completed.", "action");
+        const error = message.error;
+        if (error) {
+          const match = error.match(/line (\d+), column (\d+)/);
+          if (match) {
+            const line = parseInt(match[1], 10);
+            const column = parseInt(match[2], 10);
+            moveCaretToLineColumn(line, column);
+          }
+          postStatusMessage("Run with error (see Shell Console)", "alert");
+        } else {  
+          postStatusMessage("Run completed.", "action");
+        }
       }
     }
   });

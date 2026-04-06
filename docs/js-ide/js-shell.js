@@ -210,7 +210,7 @@
       postMessageSafe(sandboxWindow, IDE_EVENTS.SANDBOX_RUN_CODE, {
         code,
         showResult: options && options.showResult,
-        sourceName: (options && options.sourceName) || "js-shell-user-code.js",
+        sourceName: (options && options.sourceName) || undefined,
       });
     });
   }
@@ -229,9 +229,10 @@
 
     let sandbox = sandboxWindow;
     let completed = false;
+    let errorMessage = null;
 
     try {
-      const result = await evalCode(code.trim(), settings);
+      const result = await evalCode(code, settings);
       completed = sandbox === sandboxWindow;
 
       if (completed && showResult && shouldDisplayResult(result)) {
@@ -240,20 +241,17 @@
     } catch (error) {
       completed = sandbox === sandboxWindow;
       if (completed) {
-        appendLine(error.name + ": " + error.message, "error");
+        errorMessage = error.message || error.name;
+        appendLine(errorMessage, "error");
       }
     } finally {
       if (completionCallback) {
-        completionCallback(completed);
+        completionCallback(completed, errorMessage);
       }
     }
   }
 
   shellInput.handleInput = async function (input) {
-    if (input === undefined) {
-      input = this.value;
-    }
-
     if (this.pendingInputResolver) {
       this.value = "";
 
@@ -262,15 +260,15 @@
       } else {
         appendInput(input);
       }
-
       clearInput(input);
     } else if (input !== null) {
       this.value = "";
-      if (!input.trim()) return;
+      input = input.trim();
+      if (!input) return;
 
       shellHistory.push(input);
       historyIndex = shellHistory.length;
-      await runCode(input, { echoInput: true, showResult: true });
+      await runCode(input, { echoInput: true, showResult: true, sourceName: "shell-input" });
     }
   };
 
@@ -281,7 +279,8 @@
         await this.handleInput(null);
       }
     } else if (event.key === "Enter") {
-      await this.handleInput();
+      event.preventDefault();
+      await this.handleInput(this.value);
     } else if (event.key === "ArrowUp") {
       if (!shellHistory.length) return;
       event.preventDefault();
@@ -323,17 +322,14 @@
         fileName,
       });
 
-      await runCode(code, { showResult: false }, function (completed) {
+      await runCode(code, { showResult: false, sourceName: fileName }, function (completed, errorMessage) {
         clearInput();
 
         if (completed) {
           appendLine(`======= Finished ${fileName} =======`, "info");
           postMessageSafe(window.parent, IDE_EVENTS.SHELL_RUN_FINISHED, {
             fileName,
-          });
-        } else {
-          postMessageSafe(window.parent, IDE_EVENTS.SHELL_RUN_ERROR, {
-            fileName,
+            error: errorMessage
           });
         }
       });
