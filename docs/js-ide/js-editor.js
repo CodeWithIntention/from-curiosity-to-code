@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const settings = { tabSize: 4, statusMessageNormalDuration: 3000, statusMessageErrorDuration: 5000 };
+  const settings = { autoSaveTimeout: 500, tabSize: 4, statusMessageNormalDuration: 3000, statusMessageErrorDuration: 5000 };
 
   const { IDE_EVENTS, $, postMessageSafe } = JsIdeLib;
 
@@ -37,7 +37,6 @@
   const replaceAllBtn = $("replaceAllBtn");
   const closeFindReplaceBtn = $("closeFindReplaceBtn");
   const editorStatus = $("editorStatus");
-  const editorStickyStatus = $("editorStickyStatus");
   const stickyStatusText = $("stickyStatusText");
   const stickyEditedStatus = $("stickyEditedStatus");
 
@@ -73,13 +72,6 @@ console.log("Hello, " + name + "!");
   
     stickyStatusText.textContent = message.text;
     stickyStatusText.className = message.type || "sticky";
-  }
-
-  function resetEditor(fileName, code){
-    fileNameInput.value = fileName || "";
-    setStatusMessage(fileNameInput.value || "untitled");
-    initializeEditorHistory();
-    setEditorValue(code || "");
   }
 
   function updateEditedStatus(undoable = false) {
@@ -262,6 +254,7 @@ console.log("Hello, " + name + "!");
 
     lastSnapshot = getSnapshot();
     updateHighlight(undoable);
+    editor.saveValue(fileNameInput.value);
     editor.focus();
   }
 
@@ -336,6 +329,7 @@ console.log("Hello, " + name + "!");
 
     const before = getSnapshot();
     transformFn();
+    editor.saveValue(fileNameInput.value);
     const after = getSnapshot();
 
     if (after.value !== before.value) {
@@ -514,11 +508,6 @@ console.log("Hello, " + name + "!");
     moveCaretToSelection(index, index);
   }
 
-  function moveCaretToLineColumn(line, column = 1) {
-    const index = editor.indexFromLineColumn(line - 1) + column - 1;
-    moveCaretToSelection(index, index);
-  }
-
   function moveCaretToSelection(start, end) {
     setEditorSelection(start, end);
     updateCurrentLineHighlight();
@@ -527,16 +516,35 @@ console.log("Hello, " + name + "!");
     editor.focus();
   }
 
+  function restoreSavedValue() {
+    const savedValue = editor.loadSavedValue();
+    if (savedValue !== null) {
+      setEditorFileValue(savedValue.fileName, savedValue.value);
+      setTimeout(postStatusMessage, 500, `Restored last saved ${savedValue.fileName || "code"}.`, "info");
+    } else {
+      resetExample();
+    }
+  }
+
   function resetExample(undoable = false) {
-    fileNameInput.value = "example.js";
+    setEditorFileValue("example.js", exampleCode, undoable);
+  }
+
+  function resetEditor(fileName, code) {
+    setEditorFileValue(fileName, code);
+  }
+
+  function setEditorFileValue(filename, value, undoable = false) {
+    fileNameInput.value = filename || "untitled";
     postStickyStatusMessage(fileNameInput.value);
     if (undoable) {
       postStatusMessage(`Reset to '${fileNameInput.value}'.`, "action");
     }
-    setEditorValue(exampleCode, undoable);
+    setEditorValue(value || "", undoable);
   }
 
   function sendRunRequest() {
+    editor.saveValue();
     const code = editor.value.trimEnd();
     if (!code.trim()) {
       postStatusMessage("Please enter some code before running.", "alert");
@@ -1037,6 +1045,8 @@ console.log("Hello, " + name + "!");
     };
   };
 
+  let autoSaveTimer = null;
+
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && isSearchBarOpen()) {
       event.preventDefault();
@@ -1081,6 +1091,18 @@ console.log("Hello, " + name + "!");
       pushUndoSnapshot(lastSnapshot);
       lastSnapshot = current;
     }
+
+    const autoSaveTimeout = settings.autoSaveTimeout;
+    if (!autoSaveTimeout) return;
+
+    if (autoSaveTimer) {
+      clearTimeout(autoSaveTimer);
+    }
+
+    autoSaveTimer = setTimeout(() => {
+      editor.saveValue(fileNameInput.value);
+      autoSaveTimer = null;
+    }, autoSaveTimeout); // save after specified timeout of no typing
   });
 
   editor.addEventListener("keydown", function (event) {
@@ -1312,7 +1334,6 @@ console.log("Hello, " + name + "!");
     reader.onload = function (e) {
       const newCode = e.target.result;
       resetEditor(file.name, newCode);
-      setStatusMessage(file.name);
       initializeEditorHistory();
     };
 
@@ -1369,7 +1390,7 @@ console.log("Hello, " + name + "!");
     }
   });
 
+  restoreSavedValue();
   initializeEditorHistory();
-  resetExample();
   postMessageSafe(window.parent, IDE_EVENTS.EDITOR_READY, {});
 })();

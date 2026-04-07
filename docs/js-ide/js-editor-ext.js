@@ -94,9 +94,10 @@
     return index + (column || 0);
   }
 
+  let editorMetrics = null;
   editor.getCharacterMetrics = function() {
-    if (this._metrics) {
-      return this._metrics;
+    if (editorMetrics) {
+      return editorMetrics;
     }
 
     const style = getComputedStyle(this);
@@ -115,18 +116,45 @@
     const charWidth = probe.getBoundingClientRect().width;
     document.body.removeChild(probe);
 
-    this._metrics = {
+    editorMetrics = {
       lineHeight,
       charWidth,
       paddingTop,
       paddingLeft,
     };
 
-    return this._metrics;
+    return editorMetrics;
+  }
+
+  let lastSavedValue = null;
+  let lastSavedFileName = null;
+
+  editor.loadSavedValue = function () {
+    const savedValue = localStorage.getItem(`editor.${editor.id}.value`);
+    const fileName = localStorage.getItem(`editor.${editor.id}.fileName`);
+    if (savedValue !== null) {
+      editor.value = savedValue;
+      lastSavedValue = savedValue;
+      return {fileName, value: savedValue};
+    }
+    return null;
+  };
+
+  editor.saveValue = function (fileName) {
+      const currentValue = this.value;
+      if (currentValue !== lastSavedValue) {
+        localStorage.setItem(`editor.${editor.id}.value`, currentValue);
+        lastSavedValue = currentValue;
+      }
+
+      const currentFileName = fileName || lastSavedFileName;
+      if (currentFileName !== lastSavedFileName) {
+        localStorage.setItem(`editor.${editor.id}.fileName`, currentFileName);
+        lastSavedFileName = currentFileName;
+      }
   }
 
   window.addEventListener("resize", function () {
-    editor._metrics = null
+    editorMetrics = null
   });
-
 })();
