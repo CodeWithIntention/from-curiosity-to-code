@@ -204,10 +204,10 @@
         /at (.+) \(([^:]+):(\d+):(\d+)\)/g,
         (_, func, file, line, col) => {
           const lineNumber = Math.max(0, parseInt(line, 10)-1);
-          if (lineNumber > codeLineCount) return "..."
+          if (lineNumber > codeLineCount) return ""
           return `in ${file}:${func} at line ${lineNumber}, column ${col}`;
         }
-      );
+      ).trim();
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
         ok: false,
         error: errorMessage,
