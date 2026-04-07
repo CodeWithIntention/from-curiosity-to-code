@@ -176,42 +176,51 @@
     window.Graphics = Graphics;
   }
 
+  let runCodePromiseReject = null;
+
   async function runCode(code, options) {
     const settings = options || {};
     const sourceName = settings.sourceName || sandboxConfig.sourceName;
     const showResult = settings.showResult && !(code.includes("await "));
-    const codeLineCount = code.split("\n").length;
+    const sourceCode = `${code}\n//# sourceURL=${sourceName}`;
 
     try {
       let result = undefined;
       if (showResult) {
-        result = window.eval(`\n${code}\n//# sourceURL=${sourceName}`);
+        result = window.eval(sourceCode);
         if (result instanceof Promise) {
           result = await result;
         }
       } else {
-        const wrappedCode = `(async function () {\n${code}\n})()\n//# sourceURL=${sourceName}`;
-        result = await window.eval(wrappedCode);
+        const blob = new Blob([sourceCode], { type: "text/javascript" });
+        const url = URL.createObjectURL(blob);
+        
+        result = await new Promise((resolve, reject) => {
+          runCodePromiseReject = reject;
+          const script = document.createElement("script");
+          script.src = url;
+
+          document.body.appendChild(script);
+
+          script.onload = script.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve();
+          };
+        });   
       }
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
         ok: true,
         result: result === undefined ? undefined : stringifyValue(result),
       });
     } catch (error) {
-      let errorMessage = error && error.stack ? error.stack : error.message || String(error);
+      let errorMessage = error.stack || error.message || String(error);
       errorMessage = errorMessage.split("at eval (<anonymous>)")[0].split("at runCode")[0].trim();
-      errorMessage = errorMessage.replace(
-        /at (.+) \(([^:]+):(\d+):(\d+)\)/g,
-        (_, func, file, line, col) => {
-          const lineNumber = Math.max(0, parseInt(line, 10)-1);
-          if (lineNumber > codeLineCount) return ""
-          return `in ${file}:${func} at line ${lineNumber}, column ${col}`;
-        }
-      ).trim();
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
         ok: false,
-        error: errorMessage,
+        error: {message: errorMessage, line: error.line, column: error.column},
       });
+    } finally {
+      runCodePromiseReject = null;
     }
   }
 
@@ -236,6 +245,32 @@
         break;
     }
   });
+
+  window.onerror = function (message, source, line, column, error) {
+    reportError({from: 'onerror',
+      message,
+      source,
+      line,
+      column,
+      stack: error && error.stack ? error.stack : null
+    });
+  };
+
+  window.addEventListener("unhandledrejection", function (event) {
+    const error = event.reason;
+    reportError({
+      from: 'unhandledrejection',
+      message: error && error.message ? error.message : String(error),
+      source: null,
+      line: null,
+      column: null,
+      stack: error && error.stack ? error.stack : null
+    });
+  });
+
+  function reportError(errorInfo) {
+    runCodePromiseReject && runCodePromiseReject(errorInfo);
+  }
 
   injectClasses();
   injectAlert();

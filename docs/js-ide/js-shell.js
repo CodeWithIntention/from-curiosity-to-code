@@ -1,4 +1,4 @@
-(function () {
+(async function () {
   "use strict";
 
   const {
@@ -23,6 +23,7 @@
     inputPlaceholder: "Enter input here (Esc to Cancel)",
     shellResetMessage: "Shell resetted. Variables and state were cleared.",
     shellReadyMessage: "JavaScript shell ready.",
+    confirmReset: "Are you sure you want to reset the shell? This will clear all variables and state."
   };
 
   const shellConsole = {
@@ -52,35 +53,44 @@
     },
   };
 
-  function createSandbox() {
+  async function createSandbox(forceReset = false) {
     const oldFrame = $("sandbox");
     const newFrame = oldFrame.cloneNode(false);
     oldFrame.parentNode.replaceChild(newFrame, oldFrame);
 
-    newFrame.addEventListener("load", function () {
-      sandboxWindow = newFrame.contentWindow;
-      postMessageSafe(sandboxWindow, IDE_EVENTS.SANDBOX_INIT, {
-        config: {
-          sourceName: "js-shell-user-code.js",
-        },
-      });
-    });
-    newFrame.src = new URL("js-sandbox.html", window.location.href).href;
-  }
+    return new Promise((resolve) => {
+      newFrame.addEventListener("load", function () {
+        sandboxWindow = newFrame.contentWindow;
 
-  function resetShell() {
-    if (!confirm("Are you sure you want to reset the shell? This will clear all variables and state.")) {
+        if (!forceReset) {
+          postMessageSafe(sandboxWindow, IDE_EVENTS.SANDBOX_INIT, {
+            config: {
+              sourceName: "js-shell-user-code.js",
+            },
+          });
+        }
+        resolve();
+      });
+      newFrame.src = new URL("js-sandbox.html", window.location.href).href;
+    }); 
+  } 
+
+  async function resetShell(forceReset = false) {
+    if (!forceReset && !confirm(shellMessages.confirmReset)) {
       return;
     }
     clearInput();
-    clearShell();
-    createSandbox();
-    appendLine(shellMessages.shellResetMessage, "info");
+    clearShell(forceReset);
+    await createSandbox(forceReset);
+
+    if (!forceReset) {
+      appendLine(shellMessages.shellResetMessage, "info");
+    }
   }
 
-  function clearShell(printReady) {
+  function clearShell(forceReset = false) {
     output.innerHTML = "";
-    if (printReady !== false) {
+    if (!forceReset) {
       appendLine(shellMessages.shellReadyMessage, "info");
     }
   }
@@ -202,7 +212,7 @@
           if (message.ok) {
             resolve(message.result);
           } else {
-            reject(new Error(message.error));
+            reject(message.error);
           }
         }
       }
@@ -229,7 +239,7 @@
 
     let sandbox = sandboxWindow;
     let completed = false;
-    let errorMessage = null;
+    let evalCodeError = null;
 
     try {
       const result = await evalCode(code, settings);
@@ -239,14 +249,14 @@
         appendLine(result, "result");
       }
     } catch (error) {
+      evalCodeError = error;
       completed = sandbox === sandboxWindow;
       if (completed) {
-        errorMessage = error.message || error.name;
-        appendLine(errorMessage, "error");
+        appendLine(error.message || error.name, "error");
       }
     } finally {
       if (completionCallback) {
-        completionCallback(completed, errorMessage);
+        completionCallback(completed, evalCodeError);
       }
     }
   }
@@ -301,11 +311,12 @@
   });
 
   clearShellBtn.addEventListener("click", function () {
-    clearShell(false);
-    shellInput.focus();
-  });
+    clearShell(true);
+ });
 
-  resetShellBtn.addEventListener("click", resetShell);
+  resetShellBtn.addEventListener("click", async function () {
+    await resetShell(false);
+  });
 
   window.addEventListener("message", async function (event) {
     if (event.source !== window.parent) return;
@@ -315,12 +326,13 @@
       const fileName = message.fileName || "editor code";
       const code = message.code || "";
 
-      appendLine(`======= Running ${fileName} =======`, "info");
-      clearInput();
-
       postMessageSafe(window.parent, IDE_EVENTS.SHELL_RUN_STARTED, {
         fileName,
       });
+
+      await resetShell(true);
+      clearInput();
+      appendLine(`======= Running ${fileName} =======`, "info");
 
       await runCode(code, { showResult: false, sourceName: fileName }, function (completed, errorMessage) {
         clearInput();
@@ -341,6 +353,6 @@
   });
 
   clearShell();
-  createSandbox();
   clearInput();
+  await createSandbox();
 })();

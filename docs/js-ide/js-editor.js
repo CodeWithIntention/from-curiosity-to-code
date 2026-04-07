@@ -961,8 +961,8 @@ console.log("Hello, " + name + "!");
         const blockStart = editor.lineColumnFromIndex(block.start);
         errorLine += blockStart.line;
       }
-      const start = editor.indexFromLineColumn(errorLine);
-      const end = start + errorColumn;
+      const start = editor.indexFromLineColumn(errorLine) + errorColumn-1;
+      const end = start + 1;
 
       moveCaretToSelection(start, end);
       firstLine = `${message} At line ${errorLine + 1}, column ${errorColumn}`;
@@ -1356,15 +1356,18 @@ console.log("Hello, " + name + "!");
       } else if (message.isCompleted) {
         const error = message.error;
         if (error) {
-          const match = error.match(/line (\d+), column (\d+)/);
-          if (match) {
-            const line = parseInt(match[1], 10);
-            const column = parseInt(match[2], 10);
-            moveCaretToLineColumn(line, column);
+          const {line, column} = error;
+          if (line !== undefined && column !== undefined) {
+            const start = editor.indexFromLineColumn(line-1) + column - 1;
+            const end = start + 1;
+
+            moveCaretToSelection(start, end);
+            postStatusMessage(`Run finished with error, at line ${line}, column ${column} (see Shell Console).`, "alert");
+          } else {
+            postStatusMessage("Run finished with error (see Shell Console)", "alert");
           }
-          postStatusMessage("Run with error (see Shell Console)", "alert");
         } else {  
-          postStatusMessage("Run completed.", "action");
+          postStatusMessage("Run finished successfully.", "action");
         }
       }
     }
