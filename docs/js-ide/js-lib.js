@@ -37,6 +37,9 @@
   function stringifyValue(value) {
     if (typeof value === "undefined") return "undefined";
     if (value === null) return "null";
+    if (value === Infinity) return "Infinity";
+    if (value === -Infinity) return "-Infinity";
+    if (value !== value) return "NaN"; // Check for NaN
     if (typeof value === "string") return value;
 
     try {
