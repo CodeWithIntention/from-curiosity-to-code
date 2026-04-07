@@ -88,7 +88,8 @@ console.log("Hello, " + name + "!");
   function updateEditedStatus(enableClear = isContentEdited) {
     clearCodeBtn.disabled = !enableClear;
     formatCodeBtn.disabled = !editor.value.trim();
-  
+    postStatusMessage(null);
+
     if (!stickyStatusMessage) return;
 
     const stickyMessageText = stickyStatusMessage && stickyStatusMessage.text || "";
@@ -118,35 +119,18 @@ console.log("Hello, " + name + "!");
   }
 
   function postStatusMessage(text, type = "info") {
-    function update(message) {
-      if (message && message.text) {
-        currentStatusMessage = message;
-        editorStatus.innerHTML = `<span class='${message.type}'>${message.text}</span>`;
-        editorStatus.hidden = false;
-        lastSnapshot && (lastSnapshot.statusMessage = message);
-        return message;
-      }
-      currentStatusMessage = null;
-      lastSnapshot && (lastSnapshot.statusMessage = null);
-    
-      editorStatus.hidden = true;
-      editorStatus.innerHTML = "";
-      return null;
+    if (text) {
+      currentStatusMessage = {text, type};
+      editorStatus.innerHTML = `<span class='${type}'>${text}</span>`;
+      editorStatus.hidden = false;
+      lastSnapshot && (lastSnapshot.statusMessage = currentStatusMessage);
+      return;
     }
-
-    function clear(message) {
-      if (message && message.postId) {
-        clearTimeout(message.postId);
-        message.postId = null;
-      }
-      update(null);
-    }
-
-    clear(currentStatusMessage);
-    const message = update({text, type});
-    if (message !== null) {
-      message.postId = setTimeout(clear, type === 'error' ? settings.statusMessageErrorDuration : settings.statusMessageNormalDuration, message);
-    }
+    currentStatusMessage = null;
+    lastSnapshot && (lastSnapshot.statusMessage = null);
+  
+    editorStatus.hidden = true;
+    editorStatus.innerHTML = "";
   }
 
   function getSnapshot(useUndoPosition) {
@@ -368,6 +352,7 @@ console.log("Hello, " + name + "!");
     redoStack.push(current);
     setEditorValue(previous);
     updateUndoRedoButtons();
+    updateEditedStatus();
   
     setStatus(previous.stickyStatusMessage);
 
@@ -377,7 +362,6 @@ console.log("Hello, " + name + "!");
     } else {
       postStatusMessage("Undo last edit.", "action");
     }
-    updateEditedStatus();
     editor.focus();
   }
 
@@ -389,6 +373,7 @@ console.log("Hello, " + name + "!");
     undoStack.push(current);
     setEditorValue(next);
     updateUndoRedoButtons();
+    updateEditedStatus();
 
     setStatus(next.stickyStatusMessage);
 
@@ -398,7 +383,6 @@ console.log("Hello, " + name + "!");
     } else {
       postStatusMessage("Redo last edit.", "action");
     }
-    updateEditedStatus();
     editor.focus();
   }
 
@@ -1084,13 +1068,14 @@ console.log("Hello, " + name + "!");
   editor.addEventListener("input", function () {
     if (ignoreEditorInput) return;
 
+    updateEditedStatus();
+    updateHighlight();
+
     const current = getSnapshot();
     if (current.value !== lastSnapshot.value) {
       pushUndoSnapshot(lastSnapshot);
       lastSnapshot = current;
     }
-    updateEditedStatus();
-    updateHighlight();
   });
 
   editor.addEventListener("keydown", function (event) {
