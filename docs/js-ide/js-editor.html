@@ -65,11 +65,12 @@
     </div>
 
     <div id="editorStatusBar" class="editor-status-bar">
-        <div class="right">
+        <div id="editorLineNumberIndicator" class="editor-status">
             <button id="toggleLineNumbersBtn" class="corner-button active" title="Toggle Line Numbers">&nbsp;#&nbsp;</button>
         </div>
-        <div id="editorStickyStatus" class="editor-status" hidden></div>
-        <div id="editorStatus" class="editor-status" hidden></div>
+        <div id="editorStickyStatus" class="editor-status"><span id="stickyStatusText"></span><span id="stickyEditedStatus"></span></div>
+        <div id="editorLineColumn" class="editor-status"></div>
+        <div id="editorStatus" class="editor-status"></div>
     </div>
 
     <div class="editor-wrap">

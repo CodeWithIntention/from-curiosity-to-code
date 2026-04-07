@@ -20,7 +20,7 @@
   --danger: #dc2626;
   --disabled: #e5e7eb;
   --handle: #cbd5e1;
-  --error: #ee3535;
+  --error: red !important;
   --alert: rgb(255, 0, 0);
   --action: orange;
   --info: #18d318;

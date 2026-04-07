@@ -38,6 +38,8 @@
   const closeFindReplaceBtn = $("closeFindReplaceBtn");
   const editorStatus = $("editorStatus");
   const editorStickyStatus = $("editorStickyStatus");
+  const stickyStatusText = $("stickyStatusText");
+  const stickyEditedStatus = $("stickyEditedStatus");
 
   const exampleCode = `/*
 Sample JavaScript code to get you started
@@ -63,42 +65,37 @@ console.log("Hello, " + name + "!");
     if (!(message && message.text)) {
       stickyStatusMessage = null;
       lastSnapshot && (lastSnapshot.stickyStatusMessage = null);
-      editorStickyStatus.innerHTML = "";
-      editorStickyStatus.hidden = true;
+      stickyStatusText.textContent = "";
       return;
     }
     stickyStatusMessage = message;
     lastSnapshot && (lastSnapshot.stickyStatusMessage = message);
-    
-    editorStickyStatus.innerHTML = `<span class='${message.type || 'sticky'}'>${message.text}</span>`;
-    editorStickyStatus.hidden = false;
+  
+    stickyStatusText.textContent = message.text;
+    stickyStatusText.className = message.type || "sticky";
   }
 
   function resetEditor(fileName, code){
     fileNameInput.value = fileName || "";
     setStatusMessage(fileNameInput.value || "untitled");
-    setEditorValue(code || "");
     initializeEditorHistory();
-    editor.focus();
-
-    clearCodeBtn.disabled = fileName || code ? false : true;
-    formatCodeBtn.disabled = code ? false : true;
+    setEditorValue(code || "");
   }
 
-  function updateEditedStatus(enableClear = isContentEdited) {
-    clearCodeBtn.disabled = !enableClear;
+  function updateEditedStatus(undoable = false) {
+    const isEdited = isContentEdited();
+    clearCodeBtn.disabled = !(editor.value || isEdited);
     formatCodeBtn.disabled = !editor.value.trim();
-    postStatusMessage(null);
 
-    if (!stickyStatusMessage) return;
+    undoable !== true && postStatusMessage(null);
+    stickyEditedStatus.textContent = isEdited && !undoable ? "*" : "";
 
-    const stickyMessageText = stickyStatusMessage && stickyStatusMessage.text || "";
+    updateLineColumnStatus();
+  }
 
-    if (stickyMessageText.endsWith("*")) {
-      postStatusMessage(null);
-    } else {
-      setStatusMessage(stickyMessageText + "*", stickyStatusMessage.type);
-    }
+  function updateLineColumnStatus() {
+    const currentPosition = editor.getCurrentPosition();
+    editorLineColumn.textContent = `${currentPosition.line}:${currentPosition.column}`;
   }
 
   function isContentEdited() {
@@ -122,14 +119,11 @@ console.log("Hello, " + name + "!");
     if (text) {
       currentStatusMessage = {text, type};
       editorStatus.innerHTML = `<span class='${type}'>${text}</span>`;
-      editorStatus.hidden = false;
       lastSnapshot && (lastSnapshot.statusMessage = currentStatusMessage);
       return;
     }
     currentStatusMessage = null;
     lastSnapshot && (lastSnapshot.statusMessage = null);
-  
-    editorStatus.hidden = true;
     editorStatus.innerHTML = "";
   }
 
@@ -233,15 +227,16 @@ console.log("Hello, " + name + "!");
     updateCurrentLineHighlight();
   }
 
-  function updateHighlight() {
+  function updateHighlight(undoable = false) {
     highlighting.textContent = editor.value || " ";
     Prism.highlightElement(highlighting);
     updateLineNumbers();
     refreshFindUI();
+    updateEditedStatus(undoable);
     requestAnimationFrame(syncEditorLayout);
   }
 
-  function setEditorValue(value, pushToUndoStack = false) {
+  function setEditorValue(value, undoable = false) {
     const snapshot =
       typeof value === "object" && value.value !== undefined
         ? value
@@ -252,7 +247,7 @@ console.log("Hello, " + name + "!");
             scrollTop: 0,
           };
 
-    if (pushToUndoStack) {
+    if (undoable) {
       pushUndoSnapshot(getSnapshot());
     }
 
@@ -266,7 +261,7 @@ console.log("Hello, " + name + "!");
     ignoreEditorInput = false;
 
     lastSnapshot = getSnapshot();
-    updateHighlight();
+    updateHighlight(undoable);
     editor.focus();
   }
 
@@ -294,6 +289,14 @@ console.log("Hello, " + name + "!");
   }
 
   function setEditorSelection(start, end, scrollTop) {
+    if (start > end) {
+      const temp = start;
+      start = end;
+      end = temp;
+      editor.selectionDirection = "backward";
+    } else {
+      editor.selectionDirection = "forward";
+    }
     if (start >= 0) {
       editor.selectionStart = start;
     }
@@ -518,9 +521,10 @@ console.log("Hello, " + name + "!");
 
   function moveCaretToSelection(start, end) {
     setEditorSelection(start, end);
-    editor.focus();
     updateCurrentLineHighlight();
     refreshFindUI();
+    updateLineColumnStatus();
+    editor.focus();
   }
 
   function resetExample(undoable = false) {
@@ -948,7 +952,7 @@ console.log("Hello, " + name + "!");
       const start = editor.indexFromLineColumn(errorLine) + errorColumn-1;
       const end = start + 1;
 
-      moveCaretToSelection(start, end);
+      moveCaretToSelection(end, start);
       firstLine = `${message} At line ${errorLine + 1}, column ${errorColumn}`;
     }
     postStatusMessage(`${context} format error: ${firstLine}`, 'error');
@@ -1053,22 +1057,23 @@ console.log("Hello, " + name + "!");
     updateCurrentLineHighlight();
     refreshFindUI();
   });
-
+  
   editor.addEventListener("keyup", function () {
     updateCurrentLineHighlight();
     updateSnapshotSelection();
     refreshFindUI();
+    updateLineColumnStatus();
   });
 
   editor.addEventListener("mouseup", function () {
     updateSnapshotSelection();
     refreshFindUI();
+    updateLineColumnStatus();
   });
 
   editor.addEventListener("input", function () {
     if (ignoreEditorInput) return;
 
-    updateEditedStatus();
     updateHighlight();
 
     const current = getSnapshot();
@@ -1341,12 +1346,18 @@ console.log("Hello, " + name + "!");
       } else if (message.isCompleted) {
         const error = message.error;
         if (error) {
-          const {line, column} = error;
+          const {message, line, column} = error;
           if (line !== undefined && column !== undefined) {
-            const start = editor.indexFromLineColumn(line-1) + column - 1;
-            const end = start + 1;
+            let start = editor.indexFromLineColumn(line-1) + column - 1;
+            let end = start + 1;
 
-            moveCaretToSelection(start, end);
+            let match = message.match(/'(.*)'/) || message.match(/:\s+(\w+)\s+is not defined/);
+            if (match && match.length > 1) {
+              end = editor.value.indexOf(match[1], start);
+              start = end + match[1].length;
+            }
+
+            moveCaretToSelection(end, start);
             postStatusMessage(`Run finished with error, at line ${line}, column ${column} (see Shell Console).`, "alert");
           } else {
             postStatusMessage("Run finished with error (see Shell Console)", "alert");
@@ -1360,7 +1371,5 @@ console.log("Hello, " + name + "!");
 
   initializeEditorHistory();
   resetExample();
-  refreshFindUI();
-  updateEditedStatus(true);
   postMessageSafe(window.parent, IDE_EVENTS.EDITOR_READY, {});
 })();

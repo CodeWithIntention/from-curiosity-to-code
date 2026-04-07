@@ -75,32 +75,24 @@
 
 .editor-status-bar {
   display: flex;
-  align-items: center;
   flex-direction: row;
-  padding: 0;
   border-bottom: 1px solid var(--editor-text);
   background: var(--editor-status-bar);
   color: var(--text);
 }
 
-.editor-status-bar .right {
-  width: var(--editor-line-numbers-width);
+.editor-status-bar div {
+  padding: var(--control-padding);
   border-right: 1px solid var(--editor-text);
 }
 
-.editor-status-bar .right * {
-  margin: 4px
-}
-
 .editor-status {
+  display: flex;
+  align-items: center;
   font-size: 13px;
   color: var(--muted);
-  top: 0;
-  z-index: 4;
   background: transparent;
-  color: var(--text);
   cursor: pointer;
-  padding: var(--control-padding);
 }
 
 .editor-status .error {
@@ -128,9 +120,18 @@
   color: var(--text);
 }
 
-#editorStickyStatus {
-  border-right: 1px solid var(--editor-text);
-  background: transparent;
+#editorStatus {
+  border: none;
+}
+
+#editorLineColumn {
+  display: flex;
+  justify-content: center;
+  min-width: var(--editor-line-numbers-width);
+}
+
+#editorLineNumberIndicator {
+  min-width: var(--editor-line-numbers-width);
 }
 
 #findReplaceBar {
