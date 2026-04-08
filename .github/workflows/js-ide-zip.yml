@@ -17,7 +17,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build zip
+      - name: Set release date
+        run: echo "RELEASE_DATE=$(date -u +'%Y-%m-%d')" >> "$GITHUB_ENV"
+
+      - name: Inject release date into js-release.js
+        run: |
+          sed -i "s/__RELEASE_DATE__/${RELEASE_DATE}/g" docs/js-ide/js-release.js
+
+      - name: Build js-ide.zip
         run: |
           mkdir -p docs/downloads
           cd docs
@@ -26,12 +33,12 @@ jobs:
             -x "js-ide/.git/*" \
             -x "js-ide/**/.DS_Store"
 
-      - name: Commit updated zip
+      - name: Commit updated js-ide.zip
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add docs/downloads/js-ide.zip
+          git add docs/downloads/js-ide.zip docs/js-ide/js-release.js
 
           if ! git diff --cached --quiet; then
             msg=$(git log -1 --pretty=%s --no-merges)
