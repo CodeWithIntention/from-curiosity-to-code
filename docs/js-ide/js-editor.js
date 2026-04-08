@@ -78,10 +78,8 @@ console.log("Hello, " + user + "!");
     const isEdited = isContentEdited();
     clearCodeBtn.disabled = !(editor.value || isEdited);
     formatCodeBtn.disabled = !editor.value.trim();
-
-    undoable !== true && postStatusMessage(null);
+    
     stickyEditedStatus.textContent = isEdited && !undoable ? "*" : "";
-
     updateLineColumnStatus();
   }
 
@@ -325,7 +323,7 @@ console.log("Hello, " + user + "!");
 
   function applyEditorTransform(transformFn) {
     const savedStickyStatusMessage = stickyStatusMessage;
-    updateEditedStatus();
+    postStatusMessage(null);
 
     const before = getSnapshot();
     transformFn();
@@ -339,6 +337,7 @@ console.log("Hello, " + user + "!");
       lastSnapshot = after;
       updateHighlight();
     }
+    editor.focus();
   }
 
   function undoEdit() {
@@ -531,6 +530,7 @@ console.log("Hello, " + user + "!");
   }
 
   function resetEditor(fileName, code) {
+    initializeEditorHistory();
     setEditorFileValue(fileName, code);
   }
 
@@ -1084,6 +1084,7 @@ console.log("Hello, " + user + "!");
   editor.addEventListener("input", function () {
     if (ignoreEditorInput) return;
 
+    postStatusMessage(null);
     updateHighlight();
 
     const current = getSnapshot();
@@ -1334,7 +1335,6 @@ console.log("Hello, " + user + "!");
     reader.onload = function (e) {
       const newCode = e.target.result;
       resetEditor(file.name, newCode);
-      initializeEditorHistory();
     };
 
     reader.readAsText(file);
