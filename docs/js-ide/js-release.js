@@ -1,1 +1,1 @@
-const RELEASE_DATE = "__RELEASE_DATE__";
+const RELEASE_DATE = "2026-04-08";
