@@ -6,14 +6,24 @@
   <title>From Curiosity to Code -- JavaScript IDE</title>
   <link rel="stylesheet" href="assets/css/js-css.css" />
 </head>
-<body>
+<body onload="onAppLoad()">
   <header class="app-header">
     <div>
       <div class="app-title">From Curiosity to Code</div>
-      <div class="app-subtitle">JavaScript IDE v1.0</div>
+      <div class="app-subtitle">JavaScript IDE v1.0
+        <a href="../downloads/js-ide.zip" id="download-link" title="Download the Zip file to run the IDE on your computer.">
+          Download
+        </a>
+      </div>
     </div>
     <nav class="app-nav">
       <a href="js-help.html">Help</a>
+      <a href="mailto:codewithintention@gmail.com?subject=JavaScript IDE - Bug Report&body=Hi, my name is YOUR_NAME. I encountered a bug with the JavaScript IDE.%0A%0ADescribe what happened:%0A%0ASteps to reproduce:%0A%0AExpected result:%0A">
+        Report a bug
+      </a>
+      <a href="mailto:codewithintention@gmail.com?subject=JavaScript IDE - General Inquiry&body=Hi, my name is YOUR_NAME. I have a question about the JavaScript IDE.%0A%0AThank you!">
+        Contact Us
+      </a>
     </nav>
   </header>
 
@@ -41,5 +51,14 @@
 
   <script src="js-lib.js"></script>
   <script src="js-index.js"></script>
+
+  <script>
+    function onAppLoad() {
+      const downloadLink = document.getElementById("download-link");
+      if (window.location.href.startsWith("file://") && downloadLink) {
+        //downloadLink.hidden = true;
+      }
+    }
+  </script>
 </body>
 </html>
