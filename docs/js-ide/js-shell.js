@@ -21,7 +21,7 @@
   const shellMessages = {
     jsInputPlaceholder: "Type script here and press Enter",
     inputPlaceholder: "Enter input here (Esc to Cancel)",
-    shellResetMessage: "Shell resetted. Variables and state were cleared.",
+    shellResetMessage: "Variables and state were cleared after reset.",
     shellReadyMessage: "JavaScript shell ready.",
     confirmReset: "Are you sure you want to reset the shell? This will clear all variables and state."
   };

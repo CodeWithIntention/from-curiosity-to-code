@@ -43,8 +43,8 @@
   const exampleCode = `/*
 Sample JavaScript code to get you started
 */
-let name = prompt("What is your name?");
-console.log("Hello, " + name + "!");
+let user = prompt("What is your name?");
+console.log("Hello, " + user + "!");
 `;
 
   const undoStack = [];
