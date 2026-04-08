@@ -182,30 +182,36 @@
     const settings = options || {};
     const sourceName = settings.sourceName || sandboxConfig.sourceName;
     const showResult = settings.showResult && !(code.includes("await "));
-    const sourceCode = `${code}\n//# sourceURL=${sourceName}`;
 
     try {
       let result = undefined;
       if (showResult) {
-        result = window.eval(sourceCode);
+        result = window.eval(`${code}\n//# sourceURL=${sourceName}`);
         if (result instanceof Promise) {
           result = await result;
         }
       } else {
-        const blob = new Blob([sourceCode], { type: "text/javascript" });
+        const blob = new Blob([`${code}\nwindow.runCodeDone();\n//# sourceURL=${sourceName}`], { type: "text/javascript" });
         const url = URL.createObjectURL(blob);
         
         result = await new Promise((resolve, reject) => {
           runCodePromiseReject = reject;
           const script = document.createElement("script");
+          script.type = "module";
           script.src = url;
 
-          document.body.appendChild(script);
-
-          script.onload = script.onerror = () => {
+          const runFinishedHandler = () => {
+            window.runCodeDone = null;
             URL.revokeObjectURL(url);
             resolve();
           };
+
+          script.onerror = () => {
+            runFinishedHandler();
+          };
+
+          window.runCodeDone = runFinishedHandler;
+          document.body.appendChild(script);
         });   
       }
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
