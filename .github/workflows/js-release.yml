@@ -1,9 +1,10 @@
-name: js-ide-zip
+name: js-release-date
 
 on:
-  workflow_run:
-    workflows: ["js-release-date"]
-    types: [completed]
+  push:
+    paths:
+      - '.github/workflows/js-release.yml'
+      - 'docs/js-ide/**'
 
 permissions:
   contents: write
@@ -16,28 +17,26 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build js-ide.zip
-        run: |
-          mkdir -p docs/downloads
-          cd docs
-          rm -f downloads/js-ide.zip
-          zip -r downloads/js-ide.zip js-ide \
-            -x "js-ide/.git/*" \
-            -x "js-ide/**/.DS_Store"
+      - name: Set release date
+        run: echo "RELEASE_DATE=$(date -u +'%Y-%m-%d')" >> "$GITHUB_ENV"
 
-      - name: Commit updated js-ide.zip
+      - name: Inject release date into js-release.js
+        run: |
+          sed -i "s/const RELEASE_DATE = \".*\";/const RELEASE_DATE = \"${RELEASE_DATE}\";/g" docs/js-ide/js-release.js
+
+      - name: Commit updated js-release.js
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add docs/downloads/js-ide.zip
+          git add docs/js-ide/js-release.js
 
           if ! git diff --cached --quiet; then
             msg=$(git log -1 --pretty=%s --no-merges)
             if [ -z "$msg" ]; then
               msg=$(git log -1 --pretty=%s)
             fi
-            git commit -m "zip: ${msg}"
+            git commit -m "release: ${msg}"
             git push
           else
             echo "No changes to commit"
