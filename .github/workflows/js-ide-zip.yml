@@ -22,7 +22,7 @@ jobs:
 
       - name: Inject release date into js-release.js
         run: |
-          sed -i "s/__RELEASE_DATE__/${RELEASE_DATE}/g" docs/js-ide/js-release.js
+          sed -i "s/const RELEASE_DATE = \".*\";/const RELEASE_DATE = \"${RELEASE_DATE}\";/g" docs/js-ide/index.html
 
       - name: Build js-ide.zip
         run: |
