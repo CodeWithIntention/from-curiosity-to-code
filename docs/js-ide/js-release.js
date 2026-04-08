@@ -1,0 +1,1 @@
+const RELEASE_DATE = "__RELEASE_DATE__";
