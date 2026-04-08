@@ -11,7 +11,7 @@
     <div>
       <div class="app-title">From Curiosity to Code</div>
       <div class="app-subtitle">JavaScript IDE v1.0
-        <a href="../downloads/js-ide.zip" id="download-link" title="Download the Zip file to run the IDE on your computer.">
+        <a href="../downloads/js-ide.zip" id="download-link" title="Download the Zip file to run the IDE on your computer." hidden>
           Download
         </a>
       </div>
@@ -55,8 +55,8 @@
   <script>
     function onAppLoad() {
       const downloadLink = document.getElementById("download-link");
-      if (window.location.href.startsWith("file://") && downloadLink) {
-        //downloadLink.hidden = true;
+      if (!window.location.href.startsWith("file://") && downloadLink) {
+        downloadLink.hidden = false;
       }
     }
   </script>
