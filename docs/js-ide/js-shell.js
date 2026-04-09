@@ -334,16 +334,18 @@
       clearInput();
       appendLine(`======= Running ${fileName} =======`, "info");
 
-      await runCode(code, { showResult: false, sourceName: fileName }, function (completed, errorMessage) {
-        clearInput();
+      requestAnimationFrame(async () => {
+        await runCode(code, { showResult: true, sourceName: fileName }, function (completed, errorMessage) {
+          clearInput();
 
-        if (completed) {
-          appendLine(`======= Finished ${fileName} =======`, "info");
-          postMessageSafe(window.parent, IDE_EVENTS.SHELL_RUN_FINISHED, {
-            fileName,
-            error: errorMessage
-          });
-        }
+          if (completed) {
+            appendLine(`======= Finished ${fileName} =======`, "info");
+            postMessageSafe(window.parent, IDE_EVENTS.SHELL_RUN_FINISHED, {
+              fileName,
+              error: errorMessage
+            });
+          }
+        });
       });
     } else if (message.type === IDE_EVENTS.SHELL_CLEAR) {
       clearShell(false);
