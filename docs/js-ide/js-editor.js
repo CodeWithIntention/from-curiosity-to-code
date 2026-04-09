@@ -1320,6 +1320,7 @@ console.log("Hello, " + user + "!");
     URL.revokeObjectURL(url);
     setStatusMessage(link.download);
     postStatusMessage(`Code saved as "${link.download}".`, "action");
+    editor.saveValue(fileNameInput.value);
     editor.focus();
   });
 
@@ -1369,16 +1370,24 @@ console.log("Hello, " + user + "!");
         if (error) {
           const {message, line, column} = error;
           if (line !== undefined && column !== undefined) {
-            let start = editor.indexFromLineColumn(line-1) + column - 1;
-            let end = start + 1;
+            const startOfLine = editor.indexFromLineColumn(line-1);
+            let start = startOfLine + column - 1;
+            let end = start;
 
-            let match = message.match(/'(.*)'/) || message.match(/:\s+(\w+)\s+is not defined/);
+            let match = message.match(/'(.*)'/) || message.match(/:\s+(\w+)\s+is\s/);
             if (match && match.length > 1) {
-              end = editor.value.indexOf(match[1], start);
-              start = end + match[1].length;
+              const matchedLength = match[1].length;
+              start = editor.value.indexOf(match[1], Math.max(start-matchedLength-1, 0));
+              end = Math.max(start + matchedLength, startOfLine + column - 1);
+            } else {
+              end += 1;
             }
 
-            moveCaretToSelection(end, start);
+            if (end-startOfLine >= column) {
+              moveCaretToSelection(end, start);
+            } else {
+              moveCaretToSelection(start, end);
+            }
             postStatusMessage(`Run finished with error, at line ${line}, column ${column} (see Shell Console).`, "alert");
           } else {
             postStatusMessage("Run finished with error (see Shell Console)", "alert");
