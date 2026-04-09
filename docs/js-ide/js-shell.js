@@ -53,6 +53,13 @@
     },
   };
 
+  function stringifyResult(value) {
+    if (typeof(value) === "string") {
+      return JSON.stringify(value);
+    }
+    return stringifyValue(value);
+  }
+
   async function createSandbox(forceReset = false) {
     const oldFrame = $("sandbox");
     const newFrame = oldFrame.cloneNode(false);
@@ -247,7 +254,7 @@
       completed = sandbox === sandboxWindow;
 
       if (completed && showResult && shouldDisplayResult(result)) {
-        appendLine(result, "result");
+        appendLine(stringifyResult(result), "result");
       }
     } catch (error) {
       evalCodeError = error;
