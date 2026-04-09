@@ -181,28 +181,32 @@
   async function runCode(code, options) {
     const settings = options || {};
     const sourceName = settings.sourceName || sandboxConfig.sourceName;
-    const showResult = settings.showResult && !(code.includes("await "));
+    const showResult = settings.showResult || false;
 
     try {
       let result = undefined;
       if (showResult) {
+        if (code.includes("await ")) {
+          code = `(async () => { ${code} \n})()`;
+        }
         result = window.eval(`${code}\n//# sourceURL=${sourceName}`);
         if (result instanceof Promise) {
           result = await result;
         }
       } else {
-        const blob = new Blob([`${code}\nwindow.runCodeDone();\n//# sourceURL=${sourceName}`], { type: "text/javascript" });
+        const blob = new Blob([`${code}\nrunCodeScript.onfinish();\n//# sourceURL=${sourceName}`], { type: "text/javascript" });
         const url = URL.createObjectURL(blob);
         
         result = await new Promise((resolve, reject) => {
           runCodePromiseReject = reject;
           const script = document.createElement("script");
+          script.id = "runCodeScript";
           script.type = "module";
           script.src = url;
 
           const runFinishedHandler = () => {
-            window.runCodeDone = null;
             URL.revokeObjectURL(url);
+            document.body.removeChild(script);
             resolve();
           };
 
@@ -210,7 +214,7 @@
             runFinishedHandler();
           };
 
-          window.runCodeDone = runFinishedHandler;
+          script.onfinish = runFinishedHandler;
           document.body.appendChild(script);
         });   
       }
