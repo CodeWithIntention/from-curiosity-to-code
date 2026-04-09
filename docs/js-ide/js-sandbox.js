@@ -157,25 +157,6 @@
     };
   }
 
-  function injectClasses() {
-    class Graphics {
-      constructor(windowRef, width, height) {
-        this.window = windowRef;
-        this.canvas = windowRef.document.createElement("canvas");
-        this.canvas.width = width;
-        this.canvas.height = height;
-        windowRef.document.body.appendChild(this.canvas);
-        this.ctx = this.canvas.getContext("2d");
-      }
-    }
-
-    Graphics.random = function random(min, max) {
-      return Math.random() * (max - min) + min;
-    };
-
-    window.Graphics = Graphics;
-  }
-
   let runCodePromiseReject = null;
 
   async function runCode(code, options) {
@@ -220,7 +201,7 @@
       }
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
         ok: true,
-        result: result === undefined ? undefined : stringifyValue(result),
+        result: result == undefined ? undefined : stringifyValue(result),
       });
     } catch (error) {
       let errorMessage = error.stack || error.message || String(error);
@@ -282,7 +263,6 @@
     runCodePromiseReject && runCodePromiseReject(errorInfo);
   }
 
-  injectClasses();
   injectAlert();
   injectPrompt();
   injectInput();
