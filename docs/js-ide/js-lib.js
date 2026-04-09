@@ -35,18 +35,16 @@
   }
 
   function stringifyValue(value) {
-    if (typeof value === "undefined") return "undefined";
-    if (value === null) return "null";
-    if (value === Infinity) return "Infinity";
-    if (value === -Infinity) return "-Infinity";
-    if (value !== value) return "NaN"; // Check for NaN
-    if (typeof value === "string") return value;
-
-    try {
-      return JSON.stringify(value);
-    } catch (error) {
-      return String(value);
+    if (value === undefined) return "undefined";
+    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return value;
+    if (typeof value === "object") {
+      try {
+        return JSON.stringify(value);
+      } catch (error) {
+        return String(value);
+      }
     }
+    return String(value);
   }
 
   function postMessageSafe(targetWindow, type, payload) {
