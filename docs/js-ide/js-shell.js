@@ -119,7 +119,8 @@
   function appendLine(text, className) {
     const line = document.createElement("div");
     line.className = "line " + (className || "result");
-    line.textContent = String(text);
+    text = String(text).replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n$/g, "<p/>");
+    line.innerHTML = text;
     output.appendChild(line);
     output.scrollTop = output.scrollHeight;
     return line;
@@ -335,7 +336,7 @@
       appendLine(`======= Running ${fileName} =======`, "info");
 
       requestAnimationFrame(async () => {
-        await runCode(code, { showResult: true, sourceName: fileName }, function (completed, errorMessage) {
+        await runCode(code, { showResult: false, sourceName: fileName }, function (completed, errorMessage) {
           clearInput();
 
           if (completed) {
