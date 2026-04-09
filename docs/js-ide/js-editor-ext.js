@@ -19,10 +19,11 @@
   editor.getCurrentPosition = function () {
     const before = this.value.slice(0, this.selectionStart);
     const lines = before.split("\n");
-
+    const isBackwards = this.selectionDirection === "backward";
+    const currentColumn = lines[lines.length - 1].length + 1;
     return {
       line: lines.length,
-      column: lines[lines.length - 1].length + 1,
+      column: isBackwards ? currentColumn : currentColumn + (this.selectionEnd - this.selectionStart),
       start: this.selectionStart,
       end: this.selectionEnd,
       lineStart: this.findLineStart(),
