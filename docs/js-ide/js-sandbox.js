@@ -229,14 +229,17 @@
         result: result == undefined ? undefined : stringifyValue(result),
       });
     } catch (error) {
-      const errorDescription = error.message || String(error)
+      const regexTestSafari = /^.*@/;
+      const errorDescription = error.message || String(error);
       let errorMessage = error.stack || errorDescription;
-      
-      if (errorMessage.startsWith("eval@") || errorMessage.startsWith("eval code@")) {
-        errorMessage = errorDescription;
-      } else if (errorMessage.startsWith("module code@")) {
-        errorMessage = errorMessage.replace(`@${sourceUrl}`, `\n    at ${sourceName}`);
-        errorMessage = errorMessage.replace(/^module code/, errorDescription);
+
+      if (regexTestSafari.test(errorMessage)) {
+        if (errorMessage.startsWith("eval@") || errorMessage.startsWith("eval code@")) {
+          errorMessage = errorDescription;
+        } else {
+          errorMessage = errorMessage.replaceAll(`@${sourceUrl}`, `\n    at ${sourceName}`);
+          errorMessage = `${errorDescription}\n${errorMessage}`;
+        }
       } else {
         errorMessage = errorMessage.split("at eval (<anonymous>)")[0].split("at runCode")[0].trim();
       }
