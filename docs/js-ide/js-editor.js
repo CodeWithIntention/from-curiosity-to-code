@@ -1374,7 +1374,7 @@ console.log("Hello, " + user + "!");
             let start = startOfLine + column - 1;
             let end = start;
 
-            let match = message.match(/'(.*)'/) || message.match(/:\s+(.*)\s+is\s/);
+            let match = message.match(/'(.*)'/) || message.match(/:\s+(.*)\s+is\s/) || message.match(/:\s+(\S+)/);
             if (match && match.length > 1) {
               const matchedLength = match[1].length;
               start = editor.value.indexOf(match[1], Math.max(start-matchedLength-1, 0));
