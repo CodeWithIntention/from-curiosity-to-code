@@ -21,6 +21,8 @@
     SANDBOX_ALERT: "sandbox:alert",
     SANDBOX_PROMPT: "sandbox:prompt",
     SANDBOX_PROMPT_RESPONSE: "sandbox:prompt_response",
+    SANDBOX_CONFIRM: "sandbox:confirm",
+    SANDBOX_CONFIRM_RESPONSE: "sandbox:confirm_response",
     SANDBOX_INPUT: "sandbox:input",
     SANDBOX_INPUT_RESPONSE: "sandbox:input_response",
 
@@ -28,6 +30,7 @@
     SANDBOX_CONSOLE_ERROR: "sandbox:console_error",
     SANDBOX_CONSOLE_WARN: "sandbox:console_warn",
     SANDBOX_CONSOLE_INFO: "sandbox:console_info",
+    SANDBOX_CONSOLE_DEBUG: "sandbox:console_debug",
   };
 
   function $(id) {

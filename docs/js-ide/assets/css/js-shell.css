@@ -34,6 +34,10 @@
   color: mediumturquoise;
 }
 
+.line.confirm {
+  color: rgb(252, 193, 1);
+}
+
 .line.error {
   color: var(--error);
 }
@@ -42,8 +46,16 @@
   color: var(--alert);
 }
 
+.line.warn {
+  color: orange;
+}
+
 .line.info {
   color: plum;
+}
+
+.line.debug {
+  color: rgb(175, 75, 241);
 }
 
 .line.input {

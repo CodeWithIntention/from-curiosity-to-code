@@ -39,7 +39,7 @@
 
     warn: (...args) => {
       args = args.map(stringifyValue);
-      appendLine(args.join(" "), "alert");
+      appendLine(args.join(" "), "warn");
     },
 
     info: (...args) => {
@@ -49,7 +49,7 @@
 
     debug: (...args) => {
       args = args.map(stringifyValue);
-      appendLine(args.join(" "), "info");
+      appendLine(args.join(" "), "debug");
     },
   };
 
@@ -166,6 +166,14 @@
         }
         break;
 
+      case IDE_EVENTS.SANDBOX_CONFIRM:
+        appendLine(message.text, "confirm");
+        break;
+
+      case IDE_EVENTS.SANDBOX_CONFIRM_RESPONSE:
+        appendInput(message.value, "confirm");
+        break;
+
       case IDE_EVENTS.SANDBOX_CONSOLE_LOG:
         shellConsole.log(message.text);
         break;
@@ -178,7 +186,10 @@
       case IDE_EVENTS.SANDBOX_CONSOLE_INFO:
         shellConsole.info(message.text);
         break;
-
+      case IDE_EVENTS.SANDBOX_CONSOLE_DEBUG:
+        shellConsole.debug(message.text);
+        break;
+        
       case IDE_EVENTS.SANDBOX_INPUT:
         handleSandboxInput(message.text);
         break;
