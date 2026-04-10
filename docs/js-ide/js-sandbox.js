@@ -26,6 +26,22 @@
     };
   }
 
+  function injectConfirm() {
+    const nativeConfirm = window.confirm.bind(window);
+
+    window.confirm = function (message) {
+      emitLine(IDE_EVENTS.SANDBOX_CONFIRM, message);
+
+      const response = nativeConfirm(message);
+
+      emit(IDE_EVENTS.SANDBOX_CONFIRM_RESPONSE, {
+        value: response,
+      });
+
+      return response;
+    };
+  }
+
   function injectPrompt() {
     const nativePrompt = window.prompt.bind(window);
 
@@ -69,6 +85,13 @@
         );
         return nativeConsole.warn.apply(nativeConsole, arguments);
       },
+      debug: function () {
+        emitLine(
+          IDE_EVENTS.SANDBOX_CONSOLE_DEBUG,
+          Array.from(arguments).map(stringifyValue).join(" "),
+        );
+        return nativeConsole.debug.apply(nativeConsole, arguments);
+      },  
       info: function () {
         emitLine(
           IDE_EVENTS.SANDBOX_CONSOLE_INFO,
@@ -163,9 +186,11 @@
     const settings = options || {};
     const sourceName = settings.sourceName || sandboxConfig.sourceName;
     const showResult = settings.showResult || false;
+    let sourceUrl = sourceName;
 
     try {
       let result = undefined;
+
       if (showResult) {
         if (code.includes("await ")) {
           code = `(async () => { ${code} \n})()`;
@@ -175,18 +200,18 @@
           result = await result;
         }
       } else {
-        const blob = new Blob([`${code}\nrunCodeScript.onfinish();\n//# sourceURL=${sourceName}`], { type: "text/javascript" });
-        const url = URL.createObjectURL(blob);
-        
+        const blob = new Blob([`${code}\nrunCodeScript.onfinish();`], { type: "text/javascript" });
+        sourceUrl = URL.createObjectURL(blob);
+
         result = await new Promise((resolve, reject) => {
           runCodePromiseReject = reject;
           const script = document.createElement("script");
           script.id = "runCodeScript";
           script.type = "module";
-          script.src = url;
+          script.src = sourceUrl;
 
           const runFinishedHandler = () => {
-            URL.revokeObjectURL(url);
+            URL.revokeObjectURL(sourceUrl);
             document.body.removeChild(script);
             resolve();
           };
@@ -205,7 +230,20 @@
       });
     } catch (error) {
       let errorMessage = error.stack || error.message || String(error);
-      errorMessage = errorMessage.split("at eval (<anonymous>)")[0].split("at runCode")[0].trim();
+      errorMessage = errorMessage.replace(`@${sourceUrl}`, `\n    at ${sourceName}`);
+      
+      if (errorMessage.startsWith("eval\n") || errorMessage.startsWith("eval code\n")) {
+        errorMessage = error.message || String(error);
+      } else if (errorMessage.startsWith("module code\n")) {
+        errorMessage.replace(/^module code/, (error.message || String(error)));
+      } else {
+        errorMessage = errorMessage.split("at eval (<anonymous>)")[0].split("at runCode")[0].trim();
+      }
+      
+      if (sourceUrl !== sourceName) {
+        errorMessage = errorMessage.replace(sourceUrl, sourceName);
+      }
+
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
         ok: false,
         error: {message: errorMessage, line: error.line, column: error.column},
@@ -265,6 +303,7 @@
 
   injectAlert();
   injectPrompt();
+  injectConfirm();
   injectInput();
   injectConsole();
   injectInclude();
