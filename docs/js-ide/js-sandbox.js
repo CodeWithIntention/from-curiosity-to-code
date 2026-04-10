@@ -229,13 +229,14 @@
         result: result == undefined ? undefined : stringifyValue(result),
       });
     } catch (error) {
-      let errorMessage = error.stack || error.message || String(error);
-      errorMessage = errorMessage.replace(`@${sourceUrl}`, `\n    at ${sourceName}`);
+      const errorDescription = error.message || String(error)
+      let errorMessage = error.stack || errorDescription;
       
-      if (errorMessage.startsWith("eval\n") || errorMessage.startsWith("eval code\n")) {
-        errorMessage = error.message || String(error);
-      } else if (errorMessage.startsWith("module code\n")) {
-        errorMessage.replace(/^module code/, (error.message || String(error)));
+      if (errorMessage.startsWith("eval@") || errorMessage.startsWith("eval code@")) {
+        errorMessage = errorDescription;
+      } else if (errorMessage.startsWith("module code@")) {
+        errorMessage = errorMessage.replace(`@${sourceUrl}`, `\n    at ${sourceName}`);
+        errorMessage = errorMessage.replace(/^module code/, errorDescription);
       } else {
         errorMessage = errorMessage.split("at eval (<anonymous>)")[0].split("at runCode")[0].trim();
       }
