@@ -22,7 +22,8 @@
   --handle: #cbd5e1;
   --error: red !important;
   --alert: rgb(255, 0, 0);
-  --action: orange;
+  --warn: orange;
+  --action: rgb(30, 196, 238);
   --info: #18d318;
 
   --editor-tab-size: 4;
