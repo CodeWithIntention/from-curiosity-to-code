@@ -270,8 +270,17 @@
     } catch (error) {
       evalCodeError = error;
       completed = sandbox === sandboxWindow;
+      const errorMessage = error.message || error.name;
+
       if (completed) {
-        appendLine(error.message || error.name, "error");
+        if (showResult && errorMessage.includes(shellInput.id + ':1:')) {
+          const line = error.line;
+          const column = error.column;
+          if (line === 1 && column) {
+            appendLine(" ".repeat(column + shellPrompt.textContent.length) + "^", 'error')
+          }
+        }
+        appendLine(errorMessage, "error");
       }
     } finally {
       if (completionCallback) {
@@ -297,7 +306,7 @@
 
       shellHistory.push(input);
       historyIndex = shellHistory.length;
-      await runCode(input, { echoInput: true, showResult: true, sourceName: "shell-input" });
+      await runCode(input, { echoInput: true, showResult: true, sourceName: shellInput.id });
     }
   };
 
