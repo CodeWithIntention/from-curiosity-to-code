@@ -180,8 +180,6 @@
     };
   }
 
-  let runCodePromiseReject = null;
-
   async function runCode(code, options) {
     const settings = options || {};
     const sourceName = settings.sourceName || sandboxConfig.sourceName;
@@ -200,27 +198,34 @@
           result = await result;
         }
       } else {
-        const blob = new Blob([`${code}\nrunCodeScript.onfinish();`], { type: "text/javascript" });
+        const blob = new Blob([code], { type: "text/javascript" });
         sourceUrl = URL.createObjectURL(blob);
 
         result = await new Promise((resolve, reject) => {
-          runCodePromiseReject = reject;
           const script = document.createElement("script");
-          script.id = "runCodeScript";
+          script.id = "runCodeScript"
           script.type = "module";
-          script.src = sourceUrl;
 
-          const runFinishedHandler = () => {
+          script.textContent = `
+            // Top-level await is allowed here
+            try {
+              await import('${sourceUrl}');
+              runCodeScript.onfinish();
+            } catch (err) {
+              runCodeScript.onfinish(err);
+            }
+          `;
+
+          script.onfinish = (error) => {
             URL.revokeObjectURL(sourceUrl);
             document.body.removeChild(script);
-            resolve();
+            if (error) {
+              reject(error);
+            } else {
+              resolve();
+            }
           };
 
-          script.onerror = () => {
-            runFinishedHandler();
-          };
-
-          script.onfinish = runFinishedHandler;
           document.body.appendChild(script);
         });   
       }
@@ -237,7 +242,7 @@
         if (errorMessage.startsWith("eval@") || errorMessage.startsWith("eval code@")) {
           errorMessage = errorDescription;
         } else {
-          errorMessage = errorMessage.replaceAll(`@${sourceUrl}`, `\n    at ${sourceName}`);
+          errorMessage = errorMessage.replaceAll("@", "\n    at ");
           errorMessage = `${errorDescription}\n${errorMessage}`;
         }
       } else {
@@ -245,15 +250,18 @@
       }
       
       if (sourceUrl !== sourceName) {
-        errorMessage = errorMessage.replace(sourceUrl, sourceName);
+        errorMessage = errorMessage.replaceAll(sourceUrl, sourceName);
       }
 
+      let match = errorMessage.match(/:(\d+):(\d+)/);
+      if (match && match.length > 2) {
+        error.line = Number(match[1]);
+        error.column = Number(match[2]);
+      }
       emit(IDE_EVENTS.SANDBOX_RUN_DONE, {
         ok: false,
         error: {message: errorMessage, line: error.line, column: error.column},
       });
-    } finally {
-      runCodePromiseReject = null;
     }
   }
 
@@ -277,28 +285,6 @@
         });
         break;
     }
-  });
-
-  window.onerror = function (message, source, line, column, error) {
-    reportError({from: 'onerror',
-      message,
-      source,
-      line,
-      column,
-      stack: error && error.stack ? error.stack : null
-    });
-  };
-
-  window.addEventListener("unhandledrejection", function (event) {
-    const error = event.reason;
-    reportError({
-      from: 'unhandledrejection',
-      message: error && error.message ? error.message : String(error),
-      source: null,
-      line: null,
-      column: null,
-      stack: error && error.stack ? error.stack : null
-    });
   });
 
   function reportError(errorInfo) {
