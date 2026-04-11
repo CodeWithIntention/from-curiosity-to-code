@@ -401,7 +401,7 @@ console.log("Hello, " + user + "!");
 
   function outdentSelection() {
     const selectionLines = editor.getSelectionLines();
-    const level = getTabLevel(selectionLines.text);
+    const level = getTabLevel(selectionLines.text, true);
     const updated = indentBlock(selectionLines.text, level - 1);
 
     if (selectionLines.text !== updated) {
@@ -441,10 +441,14 @@ console.log("Hello, " + user + "!");
     }
   }
 
-  function getTabLevel(block) {
+  function getTabLevel(block, outdent = false) {
     if (block === undefined || block === "") return 0;
     const minLeft = countMinMaxLeadingSpaces(block).minLeft;
-    return Math.ceil(minLeft / settings.tabSize);
+    return calcTabLevel(minLeft, outdent);
+  }
+
+  function calcTabLevel(spaces, outdent = false) {
+    return outdent === true ? Math.ceil(spaces/settings.tabSize) : Math.floor(spaces/settings.tabSize);    
   }
 
   function countLeadingSpaces(text) {
@@ -1162,13 +1166,13 @@ console.log("Hello, " + user + "!");
       return;
     }
 
-    if ((event.key === "[" && event.ctrlKey) || (this.hasSelection() && event.key === "Tab" && event.shiftKey)) {
+    if (event.key === "[" && event.ctrlKey) {
       event.preventDefault();
       outdentSelection();
       return;
     }
 
-    if (event.key === "]" && event.ctrlKey || (this.hasSelection() && event.key === "Tab" && !event.shiftKey)) {
+    if (event.key === "]" && event.ctrlKey) {
       event.preventDefault();
       indentSelection();
       return;
@@ -1177,16 +1181,31 @@ console.log("Hello, " + user + "!");
     if (event.key === "Tab") {
       event.preventDefault();
 
-      const start = editor.selectionStart;
-      const end = editor.selectionEnd;
-
       applyEditorTransform(function () {
-        if (event.shiftKey) {
-          const selected = editor.value.slice(start - 4, end);
-          const updated = selected.replace(/ {1,4}$/gm, "");
-          setEditorRangeText(updated, start - 4, end, "end");
+        const position = editor.getCurrentPosition()
+        const lineStart = editor.findLineStart(position.start);
+        const indent = position.start-lineStart;
+        const relTabLevel = calcTabLevel(indent, event.shiftKey);
+        const tabLevel = Math.max(relTabLevel + (event.shiftKey ? -1 : 1), 0);
+        const tabIndent = tabLevel*settings.tabSize;
+
+        if (position.start == position.end && editor.value.substring(lineStart, position.start).trim() === "") {
+          setEditorRangeText(" ".repeat(tabIndent), lineStart, position.start, "end");
         } else {
-          setEditorRangeText("    ", start, end, "end");
+          const indentDelta = lineStart+tabIndent-position.start;
+
+          if (event.shiftKey) {
+            const newStart = position.start + indentDelta;
+            const selected = editor.value.slice(newStart, position.end);
+            const regEx = new RegExp(` {1,${Math.abs(indentDelta)}}$`, "gm");
+            const updated = selected.replace(regEx, "");
+
+            if (updated !== selected) {
+              setEditorRangeText(updated, newStart, position.end, "end");
+            }
+          } else {
+            setEditorRangeText(" ".repeat(indentDelta), position.start, position.end, "end");
+          }
         }
       });
       return;
@@ -1204,13 +1223,19 @@ console.log("Hello, " + user + "!");
       const end = editor.selectionEnd;
       
       const selectionLine = editor.getSelectionLines().text;
-      const indent = countLeadingSpaces(selectionLine);
+      let indent = getTabLevel(selectionLine) * settings.tabSize;
+
+      if (editor.value[start-1] === '{') {
+        indent += settings.tabSize;
+      }
+
       applyEditorTransform(function () {
-        setEditorRangeText("\n" + selectionLine.substring(0, indent), start, end, "end");
+        setEditorRangeText("\n" + " ".repeat(indent), start, end, "end");
       });
       return;
     }
 
+    if (event.key == '}' && editor.getS)
     if (event.key === "/" && event.ctrlKey) {
       event.preventDefault();
       toggleBlockComment();
