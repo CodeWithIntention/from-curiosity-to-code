@@ -321,12 +321,12 @@ console.log("Hello, " + user + "!");
     updateUndoRedoButtons();
   }
 
-  function applyEditorTransform(transformFn) {
+  function applyEditorTransform(transformFn, ...Args) {
     const savedStickyStatusMessage = stickyStatusMessage;
     postStatusMessage(null);
 
     const before = getSnapshot();
-    transformFn();
+    transformFn(...Args);
     editor.saveValue(fileNameInput.value);
     const after = getSnapshot();
 
@@ -985,6 +985,39 @@ console.log("Hello, " + user + "!");
     }
   }
 
+  function performTab(outdent = false) {
+    const position = editor.getCurrentPosition();
+    const startOfLine = editor.findStartOfLine(position.lineStart);
+
+    if (position.start == position.end && position.start <= startOfLine) {
+      const indent = startOfLine-position.lineStart;
+      const relTabLevel = calcTabLevel(indent, outdent);
+      const tabLevel = Math.max(relTabLevel + (outdent ? -1 : 1), 0);
+      const tabIndent = tabLevel*settings.tabSize;
+
+      setEditorRangeText(" ".repeat(tabIndent), position.lineStart, startOfLine, "end");
+    } else {
+      const indent = position.start-position.lineStart;
+      const relTabLevel = calcTabLevel(indent, outdent);
+      const tabLevel = Math.max(relTabLevel + (outdent ? -1 : 1), 0);
+      const tabIndent = tabLevel*settings.tabSize;
+      const indentDelta = position.lineStart+tabIndent-position.start;
+
+      if (outdent) {
+        const newStart = position.start + indentDelta;
+        const selected = editor.value.slice(newStart, position.end);
+        const regEx = new RegExp(` {1,${Math.abs(indentDelta)}}$`, "gm");
+        const updated = selected.replace(regEx, "");
+
+        if (updated !== selected) {
+          setEditorRangeText(updated, newStart, position.end, "end");
+        }
+      } else {
+        setEditorRangeText(" ".repeat(indentDelta), position.start, position.end, "end");
+      }
+    }
+  }
+
   editor.getSelectedCodeBlock = function () {
     const value = this.value;
     let start = this.findLineStart();
@@ -1178,36 +1211,18 @@ console.log("Hello, " + user + "!");
       return;
     }
 
+    if (event.key === "Backspace" && !editor.hasSelection()) {
+      const position = editor.getCurrentPosition();
+      if (position.start <= editor.findStartOfLine(position.lineStart)) {
+        event.preventDefault();
+        applyEditorTransform(performTab, true);  
+      }
+      return;
+    }
+
     if (event.key === "Tab") {
       event.preventDefault();
-
-      applyEditorTransform(function () {
-        const position = editor.getCurrentPosition()
-        const lineStart = editor.findLineStart(position.start);
-        const indent = position.start-lineStart;
-        const relTabLevel = calcTabLevel(indent, event.shiftKey);
-        const tabLevel = Math.max(relTabLevel + (event.shiftKey ? -1 : 1), 0);
-        const tabIndent = tabLevel*settings.tabSize;
-
-        if (position.start == position.end && editor.value.substring(lineStart, position.start).trim() === "") {
-          setEditorRangeText(" ".repeat(tabIndent), lineStart, position.start, "end");
-        } else {
-          const indentDelta = lineStart+tabIndent-position.start;
-
-          if (event.shiftKey) {
-            const newStart = position.start + indentDelta;
-            const selected = editor.value.slice(newStart, position.end);
-            const regEx = new RegExp(` {1,${Math.abs(indentDelta)}}$`, "gm");
-            const updated = selected.replace(regEx, "");
-
-            if (updated !== selected) {
-              setEditorRangeText(updated, newStart, position.end, "end");
-            }
-          } else {
-            setEditorRangeText(" ".repeat(indentDelta), position.start, position.end, "end");
-          }
-        }
-      });
+      applyEditorTransform(performTab, event.shiftKey);
       return;
     }
 
@@ -1235,7 +1250,6 @@ console.log("Hello, " + user + "!");
       return;
     }
 
-    if (event.key == '}' && editor.getS)
     if (event.key === "/" && event.ctrlKey) {
       event.preventDefault();
       toggleBlockComment();

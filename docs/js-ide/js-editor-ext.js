@@ -31,6 +31,19 @@
     };
   };
 
+  editor.findStartOfLine = function (start) {
+    let lineStart = this.findLineStart(start);
+    const lineEnd = this.findLineEnd(lineStart);
+    const text = this.value;
+
+    while (lineStart <= lineEnd) {
+      const ch = text[lineStart];
+      if (!(ch === " " || ch === "\t")) break;
+      lineStart += 1;
+    }
+    return lineStart;
+  };
+
   editor.getWordAtCursor = function () {
     const left = this.value.slice(0, this.selectionStart);
     const right = this.value.slice(this.selectionStart);
