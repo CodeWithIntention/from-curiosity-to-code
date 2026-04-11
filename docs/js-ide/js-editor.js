@@ -280,13 +280,13 @@ console.log("Hello, " + user + "!");
   }
 
   function setEditorSelection(start, end, scrollTop) {
+    let isBackward = false;
+
     if (start > end) {
       const temp = start;
       start = end;
       end = temp;
-      editor.selectionDirection = "backward";
-    } else {
-      editor.selectionDirection = "forward";
+      isBackward = true;
     }
     if (start >= 0) {
       editor.selectionStart = start;
@@ -296,6 +296,8 @@ console.log("Hello, " + user + "!");
     } else {
       editor.selectionEnd = editor.selectionStart;
     }
+    editor.selectionDirection = isBackward ? "backward": "forward";
+
     if (scrollTop !== undefined) {
       editorContainer.scrollTop = scrollTop;
     } else {
@@ -1223,6 +1225,20 @@ console.log("Hello, " + user + "!");
     if (event.key === "Tab") {
       event.preventDefault();
       applyEditorTransform(performTab, event.shiftKey);
+      return;
+    }
+
+    if (event.key === "Home") {
+      let end = editor.selectionEnd;
+      const start = editor.findStartOfLine(end);
+
+      if (start != editor.selectionStart) {
+        event.preventDefault();
+        if (!event.shiftKey) {
+          end = start;
+        }
+        setEditorSelection(end, start);
+      }
       return;
     }
 
