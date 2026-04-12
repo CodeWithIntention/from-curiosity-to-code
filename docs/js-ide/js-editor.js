@@ -1208,13 +1208,15 @@ console.log("Hello, " + user + "!");
       return;
     }
 
-    if (event.key === "[" && event.ctrlKey) {
+    if (event.key === "[" && event.ctrlKey 
+        || event.key === "Tab" && event.shiftKey && editor.hasSelectedLine()) {
       event.preventDefault();
       outdentSelection();
       return;
     }
 
-    if (event.key === "]" && event.ctrlKey) {
+    if (event.key === "]" && event.ctrlKey 
+        || event.key === "Tab" && editor.hasSelectedLine()) {
       event.preventDefault();
       indentSelection();
       return;

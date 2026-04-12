@@ -65,6 +65,10 @@
     return this.value.slice(this.selectionStart, this.selectionEnd);
   };
 
+  editor.hasSelectedLine = function () {
+    return this.getSelection().includes("\n");
+  }
+
   editor.getSelectionLines = function () {
     const start = this.findLineStart();
     const end = this.findLineEnd();
