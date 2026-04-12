@@ -995,7 +995,7 @@ console.log("Hello, " + user + "!");
   }
 
   function performTab(outdent = false) {
-    const position = editor.getCurrentPosition();updateHigh
+    const position = editor.getCurrentPosition();
     const startOfLine = editor.findStartOfLine(position.lineStart);
 
     if (position.start == position.end && position.start <= startOfLine) {
