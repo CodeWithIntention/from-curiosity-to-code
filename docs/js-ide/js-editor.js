@@ -7,6 +7,7 @@
 
   const editorContainer = $("editorContainer");
   const editor = $("editor");
+  const preHighlighting = $("preHighlighting");
   const highlighting = $("highlighting");
   const lineNumbers = $("lineNumbers");
   const currentLineHighlight = $("currentLineHighlight");
@@ -142,6 +143,8 @@ console.log("Hello, " + user + "!");
   function syncEditorLayout() {
     editor.style.height = "auto";
     editor.style.width = "auto";
+    preHighlighting.style.height = "auto";
+    preHighlighting.style.width = "auto";
 
     const contentHeight = Math.max(
       editorContainer.clientHeight,
@@ -152,9 +155,12 @@ console.log("Hello, " + user + "!");
         (showLineNumbers ? lineNumbers.offsetWidth : 0),
       editor.scrollWidth,
     );
-
     editor.style.height = contentHeight + "px";
     editor.style.width = contentWidth + "px";
+    findHighlights.style.width = editor.style.width;
+    preHighlighting.style.height = contentHeight + "px";
+    preHighlighting.style.width = contentWidth + "px";
+
     lineNumbers.style.height = contentHeight + "px";
     findHighlights.style.height = contentHeight + "px";
   }
@@ -176,13 +182,14 @@ console.log("Hello, " + user + "!");
       currentLineHighlight.style.display = "block";
       currentLineHighlight.style.top = line.offsetTop + "px";
       currentLineHighlight.style.height = line.offsetHeight + "px";
+      currentLineHighlight.style.width = editor.style.width;
     } else {
       currentLineHighlight.style.display = "none";
     }
   }
 
   function updateLineNumbers() {
-    if (!showLineNumbers) {
+    if (!updateCurrentLineHighlight) {
       lineNumbers.innerHTML = "";
       lineNumbers.__editorLineCount__ = 0;
       updateCurrentLineHighlight();
@@ -988,7 +995,7 @@ console.log("Hello, " + user + "!");
   }
 
   function performTab(outdent = false) {
-    const position = editor.getCurrentPosition();
+    const position = editor.getCurrentPosition();updateHigh
     const startOfLine = editor.findStartOfLine(position.lineStart);
 
     if (position.start == position.end && position.start <= startOfLine) {
