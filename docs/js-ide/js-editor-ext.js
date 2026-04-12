@@ -122,7 +122,9 @@
     const lineHeight = parseFloat(style.lineHeight) || 24;
     const paddingTop = parseFloat(style.paddingTop) || 0;
     const paddingLeft = parseFloat(style.paddingLeft) || 0;
-
+    const paddingRight = parseFloat(style.paddingRight) || 0;
+    const paddingBottom = parseFloat(style.paddingBottom) || 0;
+    
     const probe = document.createElement("span");
     probe.textContent = "M";
     probe.style.position = "absolute";
@@ -139,6 +141,8 @@
       charWidth,
       paddingTop,
       paddingLeft,
+      paddingRight,
+      paddingBottom,
     };
 
     return editorMetrics;

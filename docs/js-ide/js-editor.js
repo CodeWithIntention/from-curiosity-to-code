@@ -1,7 +1,12 @@
 (function () {
   "use strict";
 
-  const settings = { autoSaveTimeout: 500, tabSize: 4, statusMessageNormalDuration: 3000, statusMessageErrorDuration: 5000 };
+  const settings = {
+    autoSaveTimeout: 500,
+    tabSize: 4,
+    statusMessageNormalDuration: 3000,
+    statusMessageErrorDuration: 5000,
+  };
 
   const { IDE_EVENTS, $, postMessageSafe } = JsIdeLib;
 
@@ -70,7 +75,7 @@ console.log("Hello, " + user + "!");
     }
     stickyStatusMessage = message;
     lastSnapshot && (lastSnapshot.stickyStatusMessage = message);
-  
+
     stickyStatusText.textContent = message.text;
     stickyStatusText.className = message.type || "sticky";
   }
@@ -79,7 +84,7 @@ console.log("Hello, " + user + "!");
     const isEdited = isContentEdited();
     clearCodeBtn.disabled = !(editor.value || isEdited);
     formatCodeBtn.disabled = !editor.value.trim();
-    
+
     stickyEditedStatus.textContent = isEdited && !undoable ? "*" : "";
     updateLineColumnStatus();
   }
@@ -87,28 +92,32 @@ console.log("Hello, " + user + "!");
   function updateLineColumnStatus() {
     const currentPosition = editor.getCurrentPosition();
     editorLineColumn.textContent = `${currentPosition.line}:${currentPosition.column}`;
+    requestAnimationFrame(scrollSelectionIntoView);
   }
 
   function isContentEdited() {
-    return (undoStack.length > 0 && undoStack[undoStack.length - 1].value !== editor.value) 
-      || (lastSnapshot && lastSnapshot.value !== editor.value);
+    return (
+      (undoStack.length > 0 &&
+        undoStack[undoStack.length - 1].value !== editor.value) ||
+      (lastSnapshot && lastSnapshot.value !== editor.value)
+    );
   }
 
-  function postStickyStatusMessage(text, type = 'sticky') {
+  function postStickyStatusMessage(text, type = "sticky") {
     function set(message) {
       setStatus(message, true);
     }
-    const message = {text, type};
+    const message = { text, type };
     setTimeout(set, 1, message);
   }
 
   function setStatusMessage(text, type = "sticky") {
-    setStatus({text, type});
+    setStatus({ text, type });
   }
 
   function postStatusMessage(text, type = "info") {
     if (text) {
-      currentStatusMessage = {text, type};
+      currentStatusMessage = { text, type };
       editorStatus.innerHTML = `<span class='${type}'>${text}</span>`;
       lastSnapshot && (lastSnapshot.statusMessage = currentStatusMessage);
       return;
@@ -141,6 +150,8 @@ console.log("Hello, " + user + "!");
   }
 
   function syncEditorLayout() {
+    const metrics = editor.getCharacterMetrics();
+
     editor.style.height = "auto";
     editor.style.width = "auto";
     preHighlighting.style.height = "auto";
@@ -149,20 +160,22 @@ console.log("Hello, " + user + "!");
     const contentHeight = Math.max(
       editorContainer.clientHeight,
       editor.scrollHeight,
-    );
+    ) + metrics.paddingTop + metrics.paddingBottom;
+
     const contentWidth = Math.max(
       editorContainer.clientWidth -
         (showLineNumbers ? lineNumbers.offsetWidth : 0),
       editor.scrollWidth,
-    );
-    editor.style.height = contentHeight + "px";
+    ) + metrics.paddingLeft + metrics.paddingRight;
+
     editor.style.width = contentWidth + "px";
     findHighlights.style.width = editor.style.width;
-    preHighlighting.style.height = contentHeight + "px";
-    preHighlighting.style.width = contentWidth + "px";
-
-    lineNumbers.style.height = contentHeight + "px";
-    findHighlights.style.height = contentHeight + "px";
+    preHighlighting.style.width = editor.style.witdth;
+    currentLineHighlight.style.width = editor.style.width;
+    editor.style.height = contentHeight + "px";
+    preHighlighting.style.height = editor.style.height;
+    lineNumbers.style.height = editor.style.height;
+    findHighlights.style.height = editor.style.height;
   }
 
   function updateActiveLineNumber(lineNumber) {
@@ -195,9 +208,10 @@ console.log("Hello, " + user + "!");
       updateCurrentLineHighlight();
       return;
     }
-  
+
     const lineIndices = editor.getLineIndices();
-    const updateLineIndicesOnly = lineNumbers.__editorLineCount__ === lineIndices.length;
+    const updateLineIndicesOnly =
+      lineNumbers.__editorLineCount__ === lineIndices.length;
     lineNumbers.__editorLineCount__ = lineIndices.length;
 
     if (updateLineIndicesOnly) {
@@ -214,7 +228,7 @@ console.log("Hello, " + user + "!");
 
       lines.forEach((line, i) => {
         html.push(
-          `<div class="line-number" data-line="${i + 1}" data-index="${index}">${i + 1}</div>`
+          `<div class="line-number" data-line="${i + 1}" data-index="${index}">${i + 1}</div>`,
         );
         index += line.length + 1;
       });
@@ -303,7 +317,7 @@ console.log("Hello, " + user + "!");
     } else {
       editor.selectionEnd = editor.selectionStart;
     }
-    editor.selectionDirection = isBackward ? "backward": "forward";
+    editor.selectionDirection = isBackward ? "backward" : "forward";
 
     if (scrollTop !== undefined) {
       editorContainer.scrollTop = scrollTop;
@@ -358,11 +372,11 @@ console.log("Hello, " + user + "!");
     setEditorValue(previous);
     updateUndoRedoButtons();
     updateEditedStatus();
-  
+
     setStatus(previous.stickyStatusMessage);
 
     let statusMessage = previous.statusMessage || {};
-    if (statusMessage.type === 'action') {
+    if (statusMessage.type === "action") {
       postStatusMessage(`Undo (${statusMessage.text})`, "action");
     } else {
       postStatusMessage("Undo last edit.", "action");
@@ -383,7 +397,7 @@ console.log("Hello, " + user + "!");
     setStatus(next.stickyStatusMessage);
 
     let statusMessage = next.statusMessage || {};
-    if (statusMessage.type === 'action') {
+    if (statusMessage.type === "action") {
       postStatusMessage(`Redo (${statusMessage.text})`, "action");
     } else {
       postStatusMessage("Redo last edit.", "action");
@@ -402,7 +416,12 @@ console.log("Hello, " + user + "!");
 
     if (selectionLines.text !== updated) {
       applyEditorTransform(function () {
-        setEditorRangeText(updated, selectionLines.start, selectionLines.end, "select");
+        setEditorRangeText(
+          updated,
+          selectionLines.start,
+          selectionLines.end,
+          "select",
+        );
         postStatusMessage("Indented selected block.", "action");
       });
     }
@@ -415,7 +434,12 @@ console.log("Hello, " + user + "!");
 
     if (selectionLines.text !== updated) {
       applyEditorTransform(function () {
-        setEditorRangeText(updated, selectionLines.start, selectionLines.end, "select");
+        setEditorRangeText(
+          updated,
+          selectionLines.start,
+          selectionLines.end,
+          "select",
+        );
         postStatusMessage("Outdented selected block.", "action");
       });
     }
@@ -424,27 +448,34 @@ console.log("Hello, " + user + "!");
   function toggleBlockComment() {
     const selectionLines = editor.getSelectionLines();
     const lines = selectionLines.text.split("\n");
-    const updated = lines.map(line => {
-      // Match leading whitespace + // (optional space)
-      const uncommentMatch = line.match(/^(\s*)\/\/\s?/);
+    const updated = lines
+      .map((line) => {
+        // Match leading whitespace + // (optional space)
+        const uncommentMatch = line.match(/^(\s*)\/\/\s?/);
 
-      if (uncommentMatch) {
-        // Uncomment
-        return line.replace(/^(\s*)\/\/\s?/, "$1");
-      }
+        if (uncommentMatch) {
+          // Uncomment
+          return line.replace(/^(\s*)\/\/\s?/, "$1");
+        }
 
-      // Skip empty or whitespace-only lines
-      if (line.trim() === "") {
-        return line;
-      }
+        // Skip empty or whitespace-only lines
+        if (line.trim() === "") {
+          return line;
+        }
 
-      // Comment: insert after indentation
-      return line.replace(/^(\s*)(\S.*)$/, "$1// $2");
-    }).join("\n");
+        // Comment: insert after indentation
+        return line.replace(/^(\s*)(\S.*)$/, "$1// $2");
+      })
+      .join("\n");
 
     if (selectionLines.text !== updated) {
       applyEditorTransform(function () {
-        setEditorRangeText(updated, selectionLines.start, selectionLines.end, "select");
+        setEditorRangeText(
+          updated,
+          selectionLines.start,
+          selectionLines.end,
+          "select",
+        );
         postStatusMessage("Toggled comments for line selection.", "action");
       });
     }
@@ -457,7 +488,9 @@ console.log("Hello, " + user + "!");
   }
 
   function calcTabLevel(spaces, outdent = false) {
-    return outdent === true ? Math.ceil(spaces/settings.tabSize) : Math.floor(spaces/settings.tabSize);    
+    return outdent === true
+      ? Math.ceil(spaces / settings.tabSize)
+      : Math.floor(spaces / settings.tabSize);
   }
 
   function countLeadingSpaces(text) {
@@ -532,7 +565,12 @@ console.log("Hello, " + user + "!");
     const savedValue = editor.loadSavedValue();
     if (savedValue !== null) {
       setEditorFileValue(savedValue.fileName, savedValue.value);
-      setTimeout(postStatusMessage, 500, `Restored last saved ${savedValue.fileName || "code"}.`, "info");
+      setTimeout(
+        postStatusMessage,
+        500,
+        `Restored last saved ${savedValue.fileName || "code"}.`,
+        "info",
+      );
     } else {
       resetExample();
     }
@@ -647,14 +685,16 @@ console.log("Hello, " + user + "!");
             selectionStart <= match.index + match.length
           );
         }
-        return match.index === selectionStart && match.length === selectionLength;
+        return (
+          match.index === selectionStart && match.length === selectionLength
+        );
       });
       return this.currentMatchIndex;
-    }
+    };
 
     this.getMatches = function () {
       return this.update(editor.value, findInput.value, findMatchCase);
-    }
+    };
   })();
 
   function clearFind() {
@@ -686,7 +726,8 @@ console.log("Hello, " + user + "!");
     }
 
     let activeIndex = findMatches.getCurrentMatchIndex();
-    let matchedMessage = matches.length === 1 ? "1 match" : matches.length + " matches"; 
+    let matchedMessage =
+      matches.length === 1 ? "1 match" : matches.length + " matches";
 
     if (activeIndex >= 0) {
       updateFindStatus(`Match ${activeIndex + 1} of ${matchedMessage}`);
@@ -744,15 +785,35 @@ console.log("Hello, " + user + "!");
 
   function scrollSelectionIntoView() {
     const metrics = editor.getCharacterMetrics();
-    const textBefore = editor.value.slice(0, editor.selectionStart);
-    const lineNumber = textBefore.split("\n").length - 1;
+    const position = editor.getCurrentPosition();
+    const lineNumber = Math.max(0, position.line - 1);
+    const lineColumn = Math.max(0, position.column - 1);
     const targetTop = lineNumber * metrics.lineHeight;
     const viewTop = editorContainer.scrollTop;
     const viewBottom = viewTop + editorContainer.clientHeight;
+    const gutterWidth = showLineNumbers ? lineNumbers.offsetWidth : 0;
+    const targetLeft = metrics.paddingLeft + lineColumn * metrics.charWidth;
+    const viewLeft = editorContainer.scrollLeft;
+    const viewRight = editorContainer.scrollLeft + editorContainer.clientWidth;
 
     if (targetTop < viewTop || targetTop + metrics.lineHeight > viewBottom) {
       editorContainer.scrollTop = Math.max(
         targetTop - metrics.lineHeight * 2,
+        0,
+      );
+    }
+
+    const leftMargin = metrics.paddingLeft;
+    const rightMargin = metrics.paddingRight + gutterWidth;
+
+    if (targetLeft < viewLeft + leftMargin) {
+      editorContainer.scrollLeft = Math.max(
+        targetLeft - leftMargin,
+        0,
+      );
+    } else if (targetLeft > viewRight - rightMargin) {
+      editorContainer.scrollLeft = Math.max(
+        targetLeft - editorContainer.clientWidth + rightMargin,
         0,
       );
     }
@@ -870,8 +931,16 @@ console.log("Hello, " + user + "!");
 
     const position = editor.getCurrentPosition();
     applyEditorTransform(function () {
-      setEditorRangeText(replaceInput.value, position.start, position.end, "select");
-      postStatusMessage(`Replaced "${query}" with "${replaceInput.value}" at line ${position.line}, column ${position.column}.`, "action");
+      setEditorRangeText(
+        replaceInput.value,
+        position.start,
+        position.end,
+        "select",
+      );
+      postStatusMessage(
+        `Replaced "${query}" with "${replaceInput.value}" at line ${position.line}, column ${position.column}.`,
+        "action",
+      );
     });
 
     refreshFindUI();
@@ -894,20 +963,26 @@ console.log("Hello, " + user + "!");
       return;
     }
 
-    postStatusMessage(`Replaced all instances of "${query}" with "${replaceInput.value}".`, "action");
-    setEditorValue({
-      value: after,
-      selectionStart: 0,
-      selectionEnd: 0,
-      scrollTop: 0,
-    }, true);
+    postStatusMessage(
+      `Replaced all instances of "${query}" with "${replaceInput.value}".`,
+      "action",
+    );
+    setEditorValue(
+      {
+        value: after,
+        selectionStart: 0,
+        selectionEnd: 0,
+        scrollTop: 0,
+      },
+      true,
+    );
     refreshFindUI();
   }
 
   function deleteCurrentLine() {
     const position = editor.getCurrentPosition();
     applyEditorTransform(function () {
-      setEditorRangeText("", position.lineStart, position.lineEnd+1, "end");
+      setEditorRangeText("", position.lineStart, position.lineEnd + 1, "end");
       postStatusMessage(`Deleted line ${position.line}.`, "action");
     });
   }
@@ -922,7 +997,10 @@ console.log("Hello, " + user + "!");
         function (formatted) {
           const blockText = indentBlock(formatted.trimEnd(), block.indent);
           if (block.text === blockText) {
-            postStatusMessage("Selected code block is already formatted.", "info");
+            postStatusMessage(
+              "Selected code block is already formatted.",
+              "info",
+            );
             return;
           }
           applyEditorTransform(function () {
@@ -940,11 +1018,14 @@ console.log("Hello, " + user + "!");
         function (formatted) {
           if (editor.value !== formatted) {
             postStatusMessage("Code formatted.", "action");
-            setEditorValue({
-              value: formatted,
-              selectionStart: editor.selectionStart,
-              selectionEnd: editor.selectionEnd,
-            }, true);
+            setEditorValue(
+              {
+                value: formatted,
+                selectionStart: editor.selectionStart,
+                selectionEnd: editor.selectionEnd,
+              },
+              true,
+            );
           } else {
             postStatusMessage("Code is already formatted.", "info");
           }
@@ -970,13 +1051,13 @@ console.log("Hello, " + user + "!");
         const blockStart = editor.lineColumnFromIndex(block.start);
         errorLine += blockStart.line;
       }
-      const start = editor.indexFromLineColumn(errorLine) + errorColumn-1;
+      const start = editor.indexFromLineColumn(errorLine) + errorColumn - 1;
       const end = start + 1;
 
       moveCaretToSelection(end, start);
       firstLine = `${message} At line ${errorLine + 1}, column ${errorColumn}`;
     }
-    postStatusMessage(`${context} format error: ${firstLine}`, 'error');
+    postStatusMessage(`${context} format error: ${firstLine}`, "error");
   }
 
   async function prettierFormat(text, onSuccess, onError) {
@@ -999,18 +1080,23 @@ console.log("Hello, " + user + "!");
     const startOfLine = editor.findStartOfLine(position.lineStart);
 
     if (position.start == position.end && position.start <= startOfLine) {
-      const indent = startOfLine-position.lineStart;
+      const indent = startOfLine - position.lineStart;
       const relTabLevel = calcTabLevel(indent, outdent);
       const tabLevel = Math.max(relTabLevel + (outdent ? -1 : 1), 0);
-      const tabIndent = tabLevel*settings.tabSize;
+      const tabIndent = tabLevel * settings.tabSize;
 
-      setEditorRangeText(" ".repeat(tabIndent), position.lineStart, startOfLine, "end");
+      setEditorRangeText(
+        " ".repeat(tabIndent),
+        position.lineStart,
+        startOfLine,
+        "end",
+      );
     } else {
-      const indent = position.start-position.lineStart;
+      const indent = position.start - position.lineStart;
       const relTabLevel = calcTabLevel(indent, outdent);
       const tabLevel = Math.max(relTabLevel + (outdent ? -1 : 1), 0);
-      const tabIndent = tabLevel*settings.tabSize;
-      const indentDelta = position.lineStart+tabIndent-position.start;
+      const tabIndent = tabLevel * settings.tabSize;
+      const indentDelta = position.lineStart + tabIndent - position.start;
 
       if (outdent) {
         const newStart = position.start + indentDelta;
@@ -1022,7 +1108,12 @@ console.log("Hello, " + user + "!");
           setEditorRangeText(updated, newStart, position.end, "end");
         }
       } else {
-        setEditorRangeText(" ".repeat(indentDelta), position.start, position.end, "end");
+        setEditorRangeText(
+          " ".repeat(indentDelta),
+          position.start,
+          position.end,
+          "end",
+        );
       }
     }
   }
@@ -1113,7 +1204,7 @@ console.log("Hello, " + user + "!");
     updateCurrentLineHighlight();
     refreshFindUI();
   });
-  
+
   editor.addEventListener("keyup", function () {
     updateCurrentLineHighlight();
     updateSnapshotSelection();
@@ -1208,15 +1299,19 @@ console.log("Hello, " + user + "!");
       return;
     }
 
-    if (event.key === "[" && event.ctrlKey 
-        || event.key === "Tab" && event.shiftKey && editor.hasSelectedLine()) {
+    if (
+      (event.key === "[" && event.ctrlKey) ||
+      (event.key === "Tab" && event.shiftKey && editor.hasSelectedLine())
+    ) {
       event.preventDefault();
       outdentSelection();
       return;
     }
 
-    if (event.key === "]" && event.ctrlKey 
-        || event.key === "Tab" && editor.hasSelectedLine()) {
+    if (
+      (event.key === "]" && event.ctrlKey) ||
+      (event.key === "Tab" && editor.hasSelectedLine())
+    ) {
       event.preventDefault();
       indentSelection();
       return;
@@ -1226,7 +1321,7 @@ console.log("Hello, " + user + "!");
       const position = editor.getCurrentPosition();
       if (position.start <= editor.findStartOfLine(position.lineStart)) {
         event.preventDefault();
-        applyEditorTransform(performTab, true);  
+        applyEditorTransform(performTab, true);
       }
       return;
     }
@@ -1251,7 +1346,7 @@ console.log("Hello, " + user + "!");
       return;
     }
 
-    if (event.key === "Enter") {  
+    if (event.key === "Enter") {
       event.preventDefault();
 
       if (event.ctrlKey) {
@@ -1261,11 +1356,11 @@ console.log("Hello, " + user + "!");
 
       const start = editor.selectionStart;
       const end = editor.selectionEnd;
-      
+
       const selectionLine = editor.getSelectionLines().text;
       let indent = getTabLevel(selectionLine) * settings.tabSize;
 
-      if (editor.value[start-1] === '{') {
+      if (editor.value[start - 1] === "{") {
         indent += settings.tabSize;
       }
 
@@ -1324,7 +1419,7 @@ console.log("Hello, " + user + "!");
         replaceAll();
       } else {
         replaceCurrent();
-      }  
+      }
     } else if (event.key === "Escape") {
       event.preventDefault();
       closeFindReplace();
@@ -1343,7 +1438,11 @@ console.log("Hello, " + user + "!");
   });
 
   clearCodeBtn.addEventListener("click", function () {
-    if (!confirm("Are you sure you want to clear the editor? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to clear the editor? This action cannot be undone.",
+      )
+    ) {
       return;
     }
     resetEditor();
@@ -1414,6 +1513,7 @@ console.log("Hello, " + user + "!");
     showLineNumbers = !showLineNumbers;
     toggleLineNumbersBtn.classList.toggle("active", showLineNumbers);
     editorContainer.classList.toggle("show-line-numbers", showLineNumbers);
+    syncEditorLayout();
     updateLineNumbers();
     refreshFindUI();
     editor.focus();
@@ -1432,31 +1532,43 @@ console.log("Hello, " + user + "!");
       } else if (message.isCompleted) {
         const error = message.error;
         if (error) {
-          const {message, line, column} = error;
+          const { message, line, column } = error;
           if (line !== undefined && column !== undefined) {
-            const startOfLine = editor.indexFromLineColumn(line-1);
+            const startOfLine = editor.indexFromLineColumn(line - 1);
             let start = startOfLine + column - 1;
             let end = start;
 
-            let match = message.match(/'(\S+)'/) || message.match(/:\s+(\S+)\s+is\s/) || message.match(/:\s+(\S+)/);
+            let match =
+              message.match(/'(\S+)'/) ||
+              message.match(/:\s+(\S+)\s+is\s/) ||
+              message.match(/:\s+(\S+)/);
             if (match && match.length > 1) {
               const matchedLength = match[1].length;
-              start = editor.value.indexOf(match[1], Math.max(start-matchedLength-1, 0));
+              start = editor.value.indexOf(
+                match[1],
+                Math.max(start - matchedLength - 1, 0),
+              );
               end = Math.max(start + matchedLength, startOfLine + column - 1);
             } else {
               end += 1;
             }
 
-            if (end-startOfLine >= column) {
+            if (end - startOfLine >= column) {
               moveCaretToSelection(end, start);
             } else {
               moveCaretToSelection(start, end);
             }
-            postStatusMessage(`Run finished with error, at line ${line}, column ${column} (see Shell Console).`, "alert");
+            postStatusMessage(
+              `Run finished with error, at line ${line}, column ${column} (see Shell Console).`,
+              "alert",
+            );
           } else {
-            postStatusMessage("Run finished with error (see Shell Console)", "alert");
+            postStatusMessage(
+              "Run finished with error (see Shell Console)",
+              "alert",
+            );
           }
-        } else {  
+        } else {
           postStatusMessage("Run finished successfully.", "action");
         }
       }
