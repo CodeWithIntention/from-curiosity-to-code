@@ -780,7 +780,7 @@ console.log("Hello, " + user + "!");
       findHighlights.style.left = leftConstraint;
     }
     refreshFindStatus();
-    renderFindHighlights();
+    requestAnimationFrame(renderFindHighlights);
   }
 
   function scrollSelectionIntoView() {
@@ -830,9 +830,6 @@ console.log("Hello, " + user + "!");
   }
 
   function openFindReplace(mode) {
-    if (isSearchBarOpen()) {
-      return;
-    }
     findReplaceBar.hidden = false;
 
     const selectedText = editor.hasSelection()
