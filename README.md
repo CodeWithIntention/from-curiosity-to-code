@@ -49,7 +49,7 @@ For the JavaScript Edition, use the [`Web-Hosted JavaScript IDE.`](https://codew
 
 ## Chapter guide
 
-- Chapter 1: Hello - [`Python`](code/chapter-01/hello.py) / [`JavaScript`](code/chapter-01/hello.ps) 
+- Chapter 1: Hello - [`Python`](code/chapter-01/hello.py) / [`JavaScript`](code/chapter-01/hello.js) 
 - Chapter 2: Guess Game v1 - [`Python`](code/chapter-02/guess_game_v1.py), [`JavaScript`](code/chapter-02/guess_game_v1.js)
 - Chapter 3: Guess Game v2 - [`Python`](code/chapter-03/guess_game_v2.py), [`JavaScript`](code/chapter-03/guess_game_v2.js)
 - Chapter 4: Guess Game v3 - [`Python`](code/chapter-04/guess_game_v3.py), [`JavaScript`](code/chapter-04/guess_game_v3.js) 
@@ -58,7 +58,7 @@ For the JavaScript Edition, use the [`Web-Hosted JavaScript IDE.`](https://codew
 - Chapter 7: Guess Game v6 - [`Python`](code/chapter-07/guess_game_v6.py), [`JavaScript`](code/chapter-07/guess_game_v6.js)
 - Chapter 8: Guess Game v7 - [`Python`](code/chapter-08/guess_game_v7.py), [`JavaScript`](code/chapter-08/guess_game_v7.js)
 - Chapter 9: Guess Game v8 - [`Python`](code/chapter-09/guess_game_v8.py), [`JavaScript`](code/chapter-09/guess_game_v8.js)
-- Chapter 10: AI Prompts - [`code/chapter-10/prompts.md`](code/chapter-10/prompts.md)
+- Chapter 10: AI Prompts - [`prompts.md`](code/chapter-10/prompts.md)
 
 ## GitHub Pages
 
