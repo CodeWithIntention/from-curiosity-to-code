@@ -7,7 +7,8 @@ The goal is to understand what the code does, decide whether it belongs, and int
 
 ## Prompt 1
 
-In Python, how do I ask the user to input "y" or "n" to a yes or no question?
+Python Edition: In Python, how do I ask the user to input "y" or "n" to a yes or no question?
+JavaScript Edition: In JavaScript, how do I ask the user to input "y" or "n" to a yes or no question?
 
 ## Prompt 2
 
