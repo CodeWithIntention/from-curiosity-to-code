@@ -119,32 +119,19 @@
       }
 
       const script = document.createElement("script");
-      const source = localStorage.getItem(fileName);
-
-      if (source) {
-        const blob = new Blob([source], { type: "text/javascript" });
-        script.src = URL.createObjectURL(blob);
-      } else {
-        script.src = new URL(fileName, window.location.href).href;
-      }
+      script.src = new URL(fileName, window.location.href).href;
 
       await new Promise((resolve, reject) => {
         script.onload = function () {
           loadedScripts.add(fileName);
-          if (source) {
-            URL.revokeObjectURL(script.src);
-          }
           resolve();
         };
 
         script.onerror = function(event) {
-          if (source) {
-            URL.revokeObjectURL(script.src);
-          }
           if (script.parentNode) {
             script.parentNode.removeChild(script);
           }
-          reject(`Failed to load script '${fileName}' from ${source ? "localStorage" : "network"}.`);
+          reject(`Failed to load script '${fileName}'.`);
         };
 
         document.head.appendChild(script);
