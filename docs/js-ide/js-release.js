@@ -1,4 +1,4 @@
 /*
  JavaScript IDE Release Date
 */
-const RELEASE_DATE = "2026-04-12";
+const RELEASE_DATE = "2026-04-15";
