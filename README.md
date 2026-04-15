@@ -6,7 +6,7 @@ This repository follows the progression of the book chapter by chapter.
 
 ## What is in this repo
 
-- runnable Python source code from the book
+- runnable source code from the book
 - chapter-by-chapter versions of the guessing game
 - optional challenge ideas for readers
 - setup and troubleshooting notes
@@ -31,7 +31,7 @@ docs/      GitHub Pages companion site content
 
 ## Getting started
 
-You need Python 3 installed on your computer.
+For the Python Edition, you need Python 3 installed on your computer.
 
 Run a chapter file like this:
 
@@ -45,19 +45,20 @@ On some systems you may need:
 python3 code/chapter-02/guess_game_v1.py
 ```
 
+For the JavaScript Edition, use the [`Web-Hosted JavaScript IDE.`](https://codewithintention.github.io/from-curiosity-to-code/js-ide/)
+
 ## Chapter guide
 
-- Chapter 1: [`code/chapter-01/hello.py`](code/chapter-01/hello.py)
-- Chapter 2: [`code/chapter-02/guess_game_v1.py`](code/chapter-02/guess_game_v1.py)
-- Chapter 3: [`code/chapter-03/guess_game_v2.py`](code/chapter-03/guess_game_v2.py)
-- Chapter 4: [`code/chapter-04/guess_game_v3.py`](code/chapter-04/guess_game_v3.py)
-- Chapter 5: [`code/chapter-05/guess_game_v4.py`](code/chapter-05/guess_game_v4.py)
-- Chapter 6: [`code/chapter-06/guess_game_v5.py`](code/chapter-06/guess_game_v5.py)
-- Chapter 7: [`code/chapter-07/guess_game_v6.py`](code/chapter-07/guess_game_v6.py)
-- Chapter 8: [`code/chapter-08/guess_game_v7.py`](code/chapter-08/guess_game_v7.py)
-- Chapter 9: [`code/chapter-09/guess_game_v8.py`](code/chapter-09/guess_game_v8.py)
-- Chapter 10: [`code/chapter-10/prompts.md`](code/chapter-10/prompts.md)
-
+- Chapter 1: Hello - [`Python`](code/chapter-01/hello.py) / [`JavaScript`](code/chapter-01/hello.js) 
+- Chapter 2: Guess Game v1 - [`Python`](code/chapter-02/guess_game_v1.py), [`JavaScript`](code/chapter-02/guess_game_v1.js)
+- Chapter 3: Guess Game v2 - [`Python`](code/chapter-03/guess_game_v2.py), [`JavaScript`](code/chapter-03/guess_game_v2.js)
+- Chapter 4: Guess Game v3 - [`Python`](code/chapter-04/guess_game_v3.py), [`JavaScript`](code/chapter-04/guess_game_v3.js) 
+- Chapter 5: Guess Game v4 - [`Python`](code/chapter-05/guess_game_v4.py), [`JavaScript`](code/chapter-05/guess_game_v4.js)
+- Chapter 6: Guess Game v5 - [`Python`](code/chapter-06/guess_game_v5.py), [`JavaScript`](code/chapter-06/guess_game_v5.js)
+- Chapter 7: Guess Game v6 - [`Python`](code/chapter-07/guess_game_v6.py), [`JavaScript`](code/chapter-07/guess_game_v6.js)
+- Chapter 8: Guess Game v7 - [`Python`](code/chapter-08/guess_game_v7.py), [`JavaScript`](code/chapter-08/guess_game_v7.js)
+- Chapter 9: Guess Game v8 - [`Python`](code/chapter-09/guess_game_v8.py), [`JavaScript`](code/chapter-09/guess_game_v8.js)
+- Chapter 10: AI Prompts - [`prompts.md`](code/chapter-10/prompts.md)
 
 ## GitHub Pages
 
