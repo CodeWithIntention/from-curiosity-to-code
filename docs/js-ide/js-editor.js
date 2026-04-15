@@ -1499,7 +1499,8 @@
 
     const link = document.createElement("a");
     link.href = url;
-    link.download = fileName.endsWith(".js") ? fileName : fileName + ".js";
+    const hasExtension = /\.[a-zA-Z0-9]+$/.test(fileName);
+    link.download = hasExtension ? fileName : fileName + ".js";
     fileNameInput.value = link.download;
 
     document.body.appendChild(link);
