@@ -137,18 +137,14 @@
           resolve();
         };
 
-        script.onerror = function () {
+        script.onerror = function(event) {
           if (source) {
             URL.revokeObjectURL(script.src);
           }
           if (script.parentNode) {
             script.parentNode.removeChild(script);
           }
-          reject(
-            new Error(
-              `Failed to load script '${fileName}' from ${source ? "localStorage" : "network"}.`,
-            ),
-          );
+          reject(`Failed to load script '${fileName}' from ${source ? "localStorage" : "network"}.`);
         };
 
         document.head.appendChild(script);
@@ -210,7 +206,7 @@
             // Top-level await is allowed here
             try {
               await import('${sourceUrl}');
-              runCodeScript.onfinish();
+              setTimeout(() => {typeof(runCodeScript) !== "undefined" && runCodeScript.onfinish()}, 1);
             } catch (err) {
               runCodeScript.onfinish(err);
             }
@@ -219,6 +215,7 @@
           script.onfinish = (error) => {
             URL.revokeObjectURL(sourceUrl);
             document.body.removeChild(script);
+
             if (error) {
               reject(error);
             } else {
@@ -285,6 +282,16 @@
         });
         break;
     }
+  });
+
+  window.addEventListener('error', (event) => {
+    const script = document.getElementById("runCodeScript");
+    script && script.onfinish(event.error || {message: event.message});
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    const script = document.getElementById("runCodeScript");
+    script && script.onfinish(event.error || event.reason);
   });
 
   function reportError(errorInfo) {

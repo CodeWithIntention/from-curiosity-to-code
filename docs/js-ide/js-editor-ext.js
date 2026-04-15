@@ -105,7 +105,7 @@
     const lines = this.value.split("\n");
     let index = 0;
 
-    for (let i = 0; i < line; i += 1) {
+    for (let i = 0; i < line && i < lines.length; i += 1) {
       index += lines[i].length + 1;
     }
 
