@@ -84,18 +84,21 @@
     </div>
 
     <div class="editor-footer">
-        <div class="toolbar">
-            <div class="control">
-                <strong>File:&nbsp;</strong>
-                <input id="fileNameInput" type="text" value="" placeholder="Enter filename" />
-            </div>
-            <button id="saveCodeBtn" title="Save code to downloads folder">Save</button>
-            <button id="loadCodeBtn" title="Load code from downloads folder">Load</button>
-            <button id="resetCodeBtn" title="Reset to example code">Reset Example</button>
+      <div class="toolbar">
+        <div class="control">
+            <strong>File:&nbsp;</strong>
+            <input id="fileNameInput" type="text" value="" placeholder="Enter filename" />
         </div>
-        <div class="toolbar">
-            <button id="runCodeBtn" class="primary" title="Run code in shell">Run</button>
-        </div>
+        <button id="saveCodeBtn" title="Save code to downloads folder">Save</button>
+        <button id="loadCodeBtn" title="Load code from downloads folder">Load</button>
+        <fieldset>
+          <select id="exampleSelect"></select>
+          <button id="resetCodeBtn" title="Reset to example code">Reset Example</button>
+        </fieldset>
+      </div>
+      <div class="toolbar" style="height: 100%">
+          <button id="runCodeBtn" class="primary" title="Run code in shell">Run</button>
+      </div>
     </div>
   </section>
 

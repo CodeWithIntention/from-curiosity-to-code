@@ -215,6 +215,11 @@ body {
   gap: 8px;
 }
 
+.toolbar fieldset {
+  border-radius: 8px;
+  padding: 4px;
+}
+
 .control {
   display: flex;
   align-items: center;

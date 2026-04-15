@@ -46,12 +46,20 @@
   const stickyStatusText = $("stickyStatusText");
   const stickyEditedStatus = $("stickyEditedStatus");
 
-  const exampleCode = `/*
-Sample JavaScript code to get you started
-*/
-let user = prompt("What is your name?");
-console.log("Hello, " + user + "!");
-`;
+  const EXAMPLE_OPTIONS = [
+    new Option("Example", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/example.js"),
+    new Option("Hello", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-01/hello.js"),
+    new Option("Guess Game — V1", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-02/guess_game_v1.js"),
+    new Option("Guess Game — V2", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-03/guess_game_v2.js"),
+    new Option("Guess Game — V3", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-04/guess_game_v3.js"),
+    new Option("Guess Game — V4", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-05/guess_game_v4.js"),
+    new Option("Guess Game — V5", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-06/guess_game_v5.js"),
+    new Option("Guess Game — V6", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-07/guess_game_v6.js"),
+    new Option("Guess Game — V7", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-08/guess_game_v7.js"),
+    new Option("Guess Game — V8", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-09/guess_game_v8.js"),
+  ];
+  
+  EXAMPLE_OPTIONS.forEach((option) => {exampleSelect.options.add(option)});
 
   const undoStack = [];
   const redoStack = [];
@@ -62,6 +70,17 @@ console.log("Hello, " + user + "!");
 
   let currentStatusMessage = null;
   let stickyStatusMessage = null;
+
+  async function fetchExampleSource(option) {
+    const url = option.value
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to load example '${option.label}'': ${response.status} ${response.statusText}`);
+    }
+
+    return await response.text();
+  }
 
   function setStatus(message, delayed = false) {
     if (delayed === false) {
@@ -561,7 +580,7 @@ console.log("Hello, " + user + "!");
     editor.focus();
   }
 
-  function restoreSavedValue() {
+  async function restoreSavedValue() {
     const savedValue = editor.loadSavedValue();
     if (savedValue !== null) {
       setEditorFileValue(savedValue.fileName, savedValue.value);
@@ -571,13 +590,25 @@ console.log("Hello, " + user + "!");
         `Restored last saved ${savedValue.fileName || "code"}.`,
         "info",
       );
+      const optionIndex = EXAMPLE_OPTIONS.findIndex((option) => option.value.endsWith(`/${savedValue.fileName}`))
+      if (optionIndex >= 0) {
+        exampleSelect.selectedIndex = optionIndex;
+      }
     } else {
-      resetExample();
+      await resetExample();
     }
   }
 
-  function resetExample(undoable = false) {
-    setEditorFileValue("example.js", exampleCode, undoable);
+  async function resetExample(undoable = false) {
+    const option = exampleSelect.selectedIndex >= 0 && exampleSelect.options[exampleSelect.selectedIndex];
+    if (!option) return;
+
+    const exampleCode = await fetchExampleSource(option);
+    const exampleFile = option.value;
+
+    if (editor.value !== exampleCode) {
+      setEditorFileValue(exampleFile.substring(exampleFile.lastIndexOf("/")+1), exampleCode, undoable);
+    }
   }
 
   function resetEditor(fileName, code) {
@@ -1202,7 +1233,7 @@ console.log("Hello, " + user + "!");
     refreshFindUI();
   });
 
-  editor.addEventListener("keyup", function () {
+  editor.addEventListener("keyup", function (event) {
     updateCurrentLineHighlight();
     updateSnapshotSelection();
     refreshFindUI();
@@ -1446,10 +1477,8 @@ console.log("Hello, " + user + "!");
     postStatusMessage("Editor cleared.", "action");
   });
 
-  resetCodeBtn.addEventListener("click", function () {
-    if (editor.value !== exampleCode) {
-      resetExample(true);
-    }
+  resetCodeBtn.addEventListener("click", async function () {
+    await resetExample(true);
     editor.focus();
   });
 
