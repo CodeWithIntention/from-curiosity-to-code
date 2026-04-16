@@ -17,7 +17,7 @@
   };
 
   editor.getCurrentPosition = function () {
-    const before = this.value.slice(0, this.selectionStart);
+    const before = this.value.slice(0, this.selectionDirection === "forward" ? this.selectionEnd : this.selectionStart);
     const lines = before.split("\n");
     const isBackwards = this.selectionDirection === "backward";
     const currentColumn = lines[lines.length - 1].length + 1;
