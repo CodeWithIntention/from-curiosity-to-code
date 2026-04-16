@@ -123,14 +123,14 @@ resetGame();
 
 function onCellClicked(index) {
     if (isGameWon) return;
-    if (!playMove(index)) return;
+    if (!playTurn(index)) return;
     
     let best = bestMove(nextPlayer());
     if (!best.win) {
         best = bestMove(lastPlayer);
     }
     if (best.index >= 0) {
-        playMove(best.index);
+        playTurn(best.index);
     }
 }
 
@@ -138,7 +138,7 @@ function nextPlayer() {
     return lastPlayer == 1 ? 2 : 1;
 }
     
-function playMove(index) {
+function playTurn(index) {
     const cell = cells[index];
     if (cell.textContent !== PLAYERS[0]) return false;
     
@@ -152,7 +152,7 @@ function playMove(index) {
     } else if (cells.find((cell) => cell.textContent === PLAYERS[0]) === undefined) {
         status.textContent = "It's a draw!";
     } else {
-        status.textContent = "You're move.";
+        status.textContent = "Your turn.";
     }
     return true;
 }
