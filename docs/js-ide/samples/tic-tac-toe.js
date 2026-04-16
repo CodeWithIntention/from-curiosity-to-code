@@ -49,9 +49,9 @@ const GAME_PAGE_HTML = `
     }
     
     #status {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background-color: var(--board-color);
+      color: var(--cell-color);
+      padding: 8px;
     }
     
     .cell {
@@ -94,7 +94,7 @@ const GAME_PAGE_HTML = `
 </html>
 `;
 
-const gameWindow = window.open("", "", "width=300,height=320");
+const gameWindow = window.open("", "", "width=300,height=330");
 if (!gameWindow) {
     alert("Please enable popups for this game to run.");
 }
