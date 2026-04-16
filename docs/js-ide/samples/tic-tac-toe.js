@@ -96,7 +96,7 @@ const GAME_PAGE_HTML = `
 
 const gameWindow = window.open("", "", "width=300,height=330");
 if (!gameWindow) {
-    alert("Please enable popups for this game to run.");
+    alert("Please enable pop-ups for this game to run.");
 }
 
 gameWindow.document.open();
