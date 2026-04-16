@@ -49,6 +49,7 @@
   const EXAMPLE_OPTIONS = [
     new Option("Example", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/example.js"),
     new Option("Hello", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-01/hello.js"),
+    new Option("Tic-Tac-Toe", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/docs/js-ide/samples/tic-tac-toe.js"),
     new Option("Guess Game — V1", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-02/guess_game_v1.js"),
     new Option("Guess Game — V2", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-03/guess_game_v2.js"),
     new Option("Guess Game — V3", "https://raw.githubusercontent.com/CodeWithIntention/from-curiosity-to-code/main/code/chapter-04/guess_game_v3.js"),
