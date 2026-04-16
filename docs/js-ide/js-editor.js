@@ -1235,6 +1235,8 @@
   });
 
   editor.addEventListener("keyup", function (event) {
+    if (event.key === "PageUp" || event.key === "PageDown") return;
+
     updateCurrentLineHighlight();
     updateSnapshotSelection();
     refreshFindUI();
