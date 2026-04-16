@@ -10,11 +10,7 @@ const WINS = [[[1, 2], [3, 6], [4, 8]],
 
 const PLAYERS = ["", "X", "O"];
 
-const gameWindow= window.open("", "", "width=300,height=320");
-
-gameWindow.document.open();
-
-gameWindow.document.write(`
+const GAME_PAGE_HTML = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -96,8 +92,15 @@ gameWindow.document.write(`
   <button id="resetGameBtn">Reset Game</button>
 </body>
 </html>
-`);
+`;
 
+const gameWindow = window.open("", "", "width=300,height=320");
+if (!gameWindow) {
+    alert("Please enable popups for this game to run.");
+}
+
+gameWindow.document.open();
+gameWindow.document.write(GAME_PAGE_HTML);
 gameWindow.document.close();
 
 const status = gameWindow.document.getElementById("status");
