@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>From Curiosity to Code -- Reversi</title>
+  <link rel="stylesheet" href="../assets/css/js-css.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <div class="app-title">From Curiosity to Code</div>
+      <div class="app-subtitle">Reversi Sample Game</div>
+    </div>
+  </header>
+
+  <main id="workspace" class="workspace">
+    <iframe
+        id="gameFrame"
+        class="host-frame"
+        title="Reversi"
+        >
+    </iframe>
+    </section>
+  </main>
+  <script>
+    const gameFrame = document.getElementById("gameFrame");
+    const windowOpenNative = window.open;
+    window.open = () => {return gameFrame.contentWindow;}
+  </script>
+  <script src="reversi.js"></script>
+</body>
+</html>
