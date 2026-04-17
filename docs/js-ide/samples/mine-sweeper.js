@@ -274,7 +274,7 @@ function resetGame(size) {
                 totalMines++;
             }
             mineField[row].push(mine);
-            divs.push(`<div class="cell">${mine ? HTML_MINE : ""}</div>`);
+            divs.push(`<div class="cell"></div>`);
         }
     }
     
