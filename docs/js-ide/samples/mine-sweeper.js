@@ -14,6 +14,7 @@ const COLORS = {
 
 const HTML_MINE = "&#128163;";
 const HTML_SPACE = "&nbsp;";
+const TEXT_FLAG = "🚩";
 const GAME_PAGE_HTML = `
 <!DOCTYPE html>
 <html>
@@ -135,11 +136,11 @@ function positionFromRowCol(row, col) {
     return {index, row, col};
 }
 
-function onCellClicked(index) {
+function onCellClicked(index, flag = false) {
     if (minesSteppedOn === totalMines) return;
     const position = positionFromIndex(index);
     
-    selectCellAtPosition(position);
+    selectCellAtPosition(position, flag);
     
     if (visitedCells === cells.length-totalMines) {
         if (minesSteppedOn == 0) {
@@ -165,8 +166,17 @@ function showRemainingMines() {
     });
 }
 
-function selectCellAtPosition(position) {
+function selectCellAtPosition(position, flag = false) {
     const cell = cells[position.index];
+    if (flag) {
+        console.log(cell.textContent);
+      if (cell.textContent === "") {
+        cell.textContent = TEXT_FLAG;
+      } else if (cell.textContent === TEXT_FLAG) {
+        cell.textContent = "";
+      }
+      return;
+    }        
     if (cell.textContent !== "") return;
     
     if (hasMineAt(position.row, position.col)) {
@@ -271,6 +281,10 @@ function resetGame(size) {
     cells.forEach((cell, index) => {
         cell.addEventListener("click", () => {
             onCellClicked(index);
+        });
+        cell.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+            onCellClicked(index, true);
         });
     });
 }
