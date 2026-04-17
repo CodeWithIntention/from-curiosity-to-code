@@ -92,7 +92,7 @@ const GAME_PAGE_HTML = `
     <select id="levelSelect">
         <option value="10" selected>Easy</option>
         <option value="20">Difficult</option>
-        <option value="30">Insane</option>
+        <option value="30">Extreme!</option>
     </select>
     <button id="resetGameBtn">Reset Game</button>
   </div>
