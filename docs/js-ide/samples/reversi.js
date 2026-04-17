@@ -1,4 +1,4 @@
-const BOARD_SiZE = 8;
+const DEFAULT_BOARD_SIZE = 8;
 const CELL_SIZE = 42;
 const PLAYERS = [null, true, false];
 const PLAYER_NAMES = {"null": "", "true": "Black", "false": "White"};
@@ -9,8 +9,8 @@ const GAME_PAGE_HTML = `
   <title>Mine Sweeper</title>
   <style>
     :root {
-        --columns:  repeat(${BOARD_SiZE}, ${CELL_SIZE}px);
-        --rows: repeat(${BOARD_SiZE}, ${CELL_SIZE}px);
+        --columns:  repeat(${DEFAULT_BOARD_SIZE}, ${CELL_SIZE}px);
+        --rows: repeat(${DEFAULT_BOARD_SIZE}, ${CELL_SIZE}px);
         --cell-font-size: 12px;
         --board-color: rgb(38, 3, 63);
         --status-color: white;
@@ -88,13 +88,18 @@ const GAME_PAGE_HTML = `
   <div id="board">
   </div>
   <div>
+    <select id="levelSelect">
+      <option value="6">6x6 Board</option>
+      <option value="8" selected>8x8 Board</option>
+      <option value="10">10x10 Board</opption>
+    </select>
     <button id="resetGameBtn">Reset Game</button>
   </div>
 </body>
 </html>
 `;
 
-const gameWindow = window.open("", "", "width=450,height=480");
+const gameWindow = window.open("", "", "width=500,height=530");
 if (!gameWindow) {
     alert("Please enable popups for this game to run.");
 }
@@ -105,15 +110,17 @@ gameWindow.document.close();
 
 const status = gameWindow.document.getElementById("status");
 const board = gameWindow.document.getElementById("board");
+const levelSelect = gameWindow.document.getElementById("levelSelect");
 const resetGameBtn = gameWindow.document.getElementById("resetGameBtn");
 
-resetGameBtn.addEventListener("click", resetGame);
+resetGameBtn.addEventListener("click", () => resetGame(Number(levelSelect.value)));
+levelSelect.addEventListener("change", () => resetGame(Number(levelSelect.value)));
 
 let cells = null;
 let squares = null;
 let lastPlayerIndex = 0;
 
-resetGame();
+resetGame(Number(levelSelect.value));
 
 function positionFromIndex(index) {
     const row = Math.floor(index / squares.length);
@@ -148,7 +155,7 @@ function playTurn(position) {
     } else if (canPlayTurn(player)) {
         status.textContent += `'\n${getPlayerName(nextPlayer)} has no move. ${getPlayerName(player)} goes again.`;
         lastPlayerIndex = nextPlayerIndex();
-        setTimeoput(computerTurn, 550, player);
+        setTimeout(computerTurn, 550, player);
     } else {
         const winner = getWinningPlayerPieces();
 
@@ -157,8 +164,8 @@ function playTurn(position) {
         } else {
             status.textContent = `No more moves left. ${getPlayerName(winner.player)} wins!`;
             winner.pieces.forEach((pos) => {
-                const cell = cells[pos.index];
-                cell.piece.classList.toggle("flipping", true);
+                // Trigger animation
+                placePieceAt(winner.player, pos, true);
             });
         }
         board.classList.toggle("gameover", true);
@@ -178,7 +185,7 @@ function computerTurn(player) {
 
 function flipPieces(player, position, opponentPieces) {
     placePieceAt(player, position);
-    opponentPieces.forEach((pos) => setTimeout(placePieceAt, 250, player, pos));
+    opponentPieces.forEach((pos) => placePieceAt(player, pos));
     
     const playerName = getPlayerName(player);
     const count = opponentPieces.length;
@@ -214,6 +221,12 @@ function placePieceAt(player, position, keepFlipping = false) {
     squares[position.row][position.col] = player;
     cell.piece.classList.remove("flipping", "black", "white");
     cell.piece.classList.add("flipping", playerColor);
+    
+    if (keepFlipping) {
+        setTimeout(() => {
+            cell.piece.classList.remove("flipping");
+        }, 200)
+    }
 }
 
 function visitSquares(visitor) {
@@ -326,13 +339,16 @@ function collectOpponentPieces(player, position, all = true) {
     return opponentPieces;
 }
 
-function resetGame() {
-    const rows = BOARD_SiZE;
-    const cols = BOARD_SiZE;
+function resetGame(size) {
+    const rows = size || DEFAULT_BOARD_SIZE;
+    const cols = size || DEFAULT_BOARD_SIZE;
     let divs = [];
 
     squares = [];
     lastPlayerIndex = 0;
+    
+    board.style.gridTemplateColumns = `repeat(${cols}, ${CELL_SIZE}px)`;
+    board.style.gridTemplateRows = `repeat(${rows}, ${CELL_SIZE}px)`;
     board.classList.toggle("gameover", false);
 
     for (let row = 0; row < rows; row++) {
@@ -354,8 +370,9 @@ function resetGame() {
         });
     });
 
-    placePieceAt(PLAYERS[1], positionFromRowCol(3, 4));
-    placePieceAt(PLAYERS[1], positionFromRowCol(4, 3));
-    placePieceAt(PLAYERS[2], positionFromRowCol(3, 3));
-    placePieceAt(PLAYERS[2], positionFromRowCol(4, 4));
+    const middle = Math.floor(size/2);
+    placePieceAt(PLAYERS[1], positionFromRowCol(middle-1, middle));
+    placePieceAt(PLAYERS[1], positionFromRowCol(middle, middle-1));
+    placePieceAt(PLAYERS[2], positionFromRowCol(middle-1, middle-1));
+    placePieceAt(PLAYERS[2], positionFromRowCol(middle, middle));
 }
