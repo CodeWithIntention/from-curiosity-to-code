@@ -23,7 +23,7 @@
     const currentColumn = lines[lines.length - 1].length + 1;
     return {
       line: lines.length,
-      column: isBackwards ? currentColumn : currentColumn + (this.selectionEnd - this.selectionStart),
+      column: currentColumn,
       start: this.selectionStart,
       end: this.selectionEnd,
       lineStart: this.findLineStart(),
