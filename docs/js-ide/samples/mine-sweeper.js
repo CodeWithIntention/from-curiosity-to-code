@@ -74,7 +74,7 @@ const GAME_PAGE_HTML = `
     
     .cell.selected {
         background-color: var(--cell-selected-color);
-        cursor: not-allowed;
+        cursor: default;
         font-weight: bold;
     }
         
@@ -90,8 +90,7 @@ const GAME_PAGE_HTML = `
   </div>
   <div>
     <select id="levelSelect">
-        <option value="5">Easy</option>
-        <option value="10" selected>Normal</option>
+        <option value="10" selected>Easy</option>
         <option value="20">Difficult</option>
         <option value="30">Insane</option>
     </select>
@@ -116,6 +115,7 @@ const levelSelect = gameWindow.document.getElementById("levelSelect");
 const resetGameBtn = gameWindow.document.getElementById("resetGameBtn");
 
 resetGameBtn.addEventListener("click", () => resetGame(Number(levelSelect.value)));
+levelSelect.addEventListener("change", () => resetGame(Number(levelSelect.value)));
 
 let cells = null;
 let mineField = null;
@@ -137,14 +137,18 @@ function positionFromRowCol(row, col) {
 }
 
 function onCellClicked(index, flag = false) {
-    if (minesSteppedOn === totalMines) return;
+    if (totalMines > 0 && minesSteppedOn === totalMines) return;
     const position = positionFromIndex(index);
     
     selectCellAtPosition(position, flag);
     
     if (visitedCells === cells.length-totalMines) {
         if (minesSteppedOn == 0) {
-            status.textContent = `Congratulations! You've identified all ${totalMines} mines!`;
+            if (totalMines > 0) {
+                status.textContent = `Congratulations! You've identified all ${totalMines} mines!`;
+            } else {
+                status.textContent = `That was too easy!`;
+            }
         } else {
             status.textContent = `You found all ${totalMines} mines! Unfortunately you stepped on ${minesSteppedOn} of them.`
         }
@@ -243,8 +247,8 @@ function hasMineAt(row, col) {
     return mineField[row][col];
 }
 
-function shouldPlaceMine() {
-    const percent = (Math.random() * 5 + 10)/100;
+function shouldPlaceMine(size) {
+    const percent = Math.min(Math.min(size/100, .25), .35);
     return Math.random() <= percent;
 }
 
@@ -265,12 +269,12 @@ function resetGame(size) {
     for (let row = 0; row < rows; row++) {
         mineField.push([]);
         for (let col = 0; col < cols; col++) {
-            const mine = shouldPlaceMine();
+            const mine = shouldPlaceMine(size);
             if (mine) {
                 totalMines++;
             }
             mineField[row].push(mine);
-            divs.push(`<div class="cell"></div>`);
+            divs.push(`<div class="cell">${mine ? HTML_MINE : ""}</div>`);
         }
     }
     
