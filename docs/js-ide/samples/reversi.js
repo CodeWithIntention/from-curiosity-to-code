@@ -153,7 +153,7 @@ function playTurn(position) {
         status.textContent += `\n${getPlayerName(nextPlayer)}'s turn.`;
         setTimeout(computerTurn, 500, nextPlayer);
     } else if (canPlayTurn(player)) {
-        status.textContent += `'\n${getPlayerName(nextPlayer)} has no move. ${getPlayerName(player)} goes again.`;
+        status.textContent += `'\n${getPlayerName(nextPlayer)} has no moves. ${getPlayerName(player)} goes again.`;
         lastPlayerIndex = nextPlayerIndex();
         setTimeout(computerTurn, 550, player);
     } else {
