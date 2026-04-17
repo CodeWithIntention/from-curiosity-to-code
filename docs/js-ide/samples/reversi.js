@@ -225,7 +225,7 @@ function placePieceAt(player, position, keepFlipping = false) {
     if (keepFlipping) {
         setTimeout(() => {
             cell.piece.classList.remove("flipping");
-        }, 200)
+        }, 250)
     }
 }
 
