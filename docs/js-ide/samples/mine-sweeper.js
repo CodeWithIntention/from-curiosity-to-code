@@ -194,6 +194,7 @@ function selectCellAtPosition(position) {
                 selectCellAtPosition(positionFromRowCol(row, col));
             });
         }
+        status.textContent = `Becareful!`;
     }
 }
 
