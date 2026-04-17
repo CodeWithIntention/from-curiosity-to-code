@@ -20,7 +20,7 @@ const GAME_PAGE_HTML = `
         --columns:  repeat(3, 80px);
         --rows: repeat(3, 80px);
         --cell-font-size: 48px;
-        --board-color: blue;
+        --board-color: rgb(38, 3, 63);
         --cell-color: white;
         --cell-selected-color: yellow;
         --cell-winner-color: lightgreen;

@@ -24,7 +24,7 @@ const GAME_PAGE_HTML = `
         --columns:  repeat(${DEFAULT_BOARD_SIZE}, ${CELL_SIZE}px);
         --rows: repeat(${DEFAULT_BOARD_SIZE}, ${CELL_SIZE}px);
         --cell-font-size: 12px;
-        --board-color: blue;
+        --board-color: rgb(38, 3, 63);
         --status-color: white;
         --cell-color: lightgray;
         --cell-selected-color:  #f5f5f5;
