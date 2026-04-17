@@ -360,7 +360,7 @@ function resetGame(size) {
     }
 
     board.innerHTML = divs.join("\n");
-    status.textContent = "Let's play Reversi!";
+    status.textContent = "Let's play Reversi! Black goes first (that's you).";
 
     cells = Array.from(gameWindow.document.querySelectorAll(".cell"));
     cells.forEach((cell, index) => {
