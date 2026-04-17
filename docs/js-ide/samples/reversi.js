@@ -1,5 +1,4 @@
-const DEFAULT_ROWS = 8;
-const DEFAULT_COLS = 8;
+const BOARD_SiZE = 8;
 const CELL_SIZE = 42;
 const PLAYERS = [null, true, false];
 const PLAYER_NAMES = {"null": "", "true": "Black", "false": "White"};
@@ -10,8 +9,8 @@ const GAME_PAGE_HTML = `
   <title>Mine Sweeper</title>
   <style>
     :root {
-        --columns:  repeat(${DEFAULT_COLS}, ${CELL_SIZE}px);
-        --rows: repeat(${DEFAULT_ROWS}, ${CELL_SIZE}px);
+        --columns:  repeat(${BOARD_SiZE}, ${CELL_SIZE}px);
+        --rows: repeat(${BOARD_SiZE}, ${CELL_SIZE}px);
         --cell-font-size: 12px;
         --board-color: rgb(38, 3, 63);
         --status-color: white;
@@ -64,7 +63,7 @@ const GAME_PAGE_HTML = `
       height: 80%;
       border-radius: 50%;
       cursor: pointer;
-      transition: transform 0.4s ease;
+      transition: transform .4s ease;
       transform-style: preserve-3d;
     }
     
@@ -145,11 +144,11 @@ function playTurn(position) {
     let nextPlayer = PLAYERS[nextPlayerIndex()];
     if (canPlayTurn(nextPlayer)) {
         status.textContent += `\n${getPlayerName(nextPlayer)}'s turn.`;
-        computerTurn(nextPlayer);
+        setTimeout(computerTurn, 500, nextPlayer);
     } else if (canPlayTurn(player)) {
         status.textContent += `'\n${getPlayerName(nextPlayer)} has no move. ${getPlayerName(player)} goes again.`;
         lastPlayerIndex = nextPlayerIndex();
-        computerTurn(player);
+        setTimeoput(computerTurn, 550, player);
     } else {
         const winner = getWinningPlayerPieces();
 
@@ -173,13 +172,13 @@ function computerTurn(player) {
     // Find the position with the move flips
     const bestPosition = findBestPosition(player);
     if (bestPosition) {
-        setTimeout(playTurn, 500, bestPosition);
+        playTurn(bestPosition);
     }
 }
 
 function flipPieces(player, position, opponentPieces) {
     placePieceAt(player, position);
-    opponentPieces.forEach((pos) => placePieceAt(player, pos));
+    opponentPieces.forEach((pos) => setTimeout(placePieceAt, 250, player, pos));
     
     const playerName = getPlayerName(player);
     const count = opponentPieces.length;
@@ -213,12 +212,8 @@ function placePieceAt(player, position, keepFlipping = false) {
     const playerColor = player === PLAYERS[1] ? "black" : "white";
 
     squares[position.row][position.col] = player;
-    cell.piece.classList.add("flipping");
-
-    setTimeout(() => {
-      cell.piece.classList.remove("black", "white", "flipping");
-      cell.piece.classList.add(playerColor);
-    }, 100);
+    cell.piece.classList.remove("flipping", "black", "white");
+    cell.piece.classList.add("flipping", playerColor);
 }
 
 function visitSquares(visitor) {
@@ -332,8 +327,8 @@ function collectOpponentPieces(player, position, all = true) {
 }
 
 function resetGame() {
-    const rows = 8;
-    const cols = 8;
+    const rows = BOARD_SiZE;
+    const cols = BOARD_SiZE;
     let divs = [];
 
     squares = [];
