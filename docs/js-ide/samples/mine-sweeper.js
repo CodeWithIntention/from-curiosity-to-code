@@ -145,7 +145,7 @@ function onCellClicked(index) {
         if (minesSteppedOn == 0) {
             status.textContent = `Congratulations! You've identified all ${totalMines} mines!`;
         } else {
-            status.textContent = `You found all ${totalMines} mines! Unfortunately you steped on ${minesSteppedOn} of them.`
+            status.textContent = `You found all ${totalMines} mines! Unfortunately you stepped on ${minesSteppedOn} of them.`
         }
         showRemainingMines();
     } else if (minesSteppedOn === totalMines) {
@@ -178,7 +178,7 @@ function selectCellAtPosition(position) {
         if (minesSteppedOn === 1) {
             status.textContent = "Oh snaps! You stepped on a mine!";
         } else {
-            status.textContent = `Kaboom! You stepped on ${minesSteppedOn} mines already!`;
+            status.textContent = `Kaboom! You stepped on ${minesSteppedOn} mines so far!`;
         }
     } else {
         const mines = countAdjacentMines(position);
