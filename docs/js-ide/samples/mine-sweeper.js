@@ -173,7 +173,6 @@ function showRemainingMines() {
 function selectCellAtPosition(position, flag = false) {
     const cell = cells[position.index];
     if (flag) {
-        console.log(cell.textContent);
       if (cell.textContent === "") {
         cell.textContent = TEXT_FLAG;
       } else if (cell.textContent === TEXT_FLAG) {
