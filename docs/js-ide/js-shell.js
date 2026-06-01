@@ -53,6 +53,13 @@
     },
   };
 
+  const shellCommandProcessors = {
+    "clear": clearShell,
+    "reset": () => resetShell(false),
+    "ai": () => {console.log('ai command in progress')}
+  }
+
+
   function stringifyResult(value) {
     if (typeof(value) === "string") {
       return JSON.stringify(value);
@@ -94,6 +101,27 @@
       appendLine(shellMessages.shellResetMessage, "info");
     }
   }
+
+  async function processCommand(input) {
+    let inputArgs = input.split(' ');
+    let command = inputArgs.pop().trim();
+    const processCommand = shellCommandProcessors[command];
+
+    if (processCommand) {
+      processCommand(inputArgs)
+    } else {
+      appendLine(`Command '${command}' not supported.`, 'error');
+    }
+  }
+
+  async function processCode(input) {
+    await runCode(input, { echoInput: true, showResult: true, sourceName: shellInput.id });
+  }
+
+  const shellInputProcessors = [
+    processCommand,
+    processCode,
+  ];
 
   function clearShell(forceReset = false) {
     output.innerHTML = "";
@@ -306,7 +334,12 @@
 
       shellHistory.push(input);
       historyIndex = shellHistory.length;
-      await runCode(input, { echoInput: true, showResult: true, sourceName: shellInput.id });
+
+      if (input.startsWith('/')) {
+        processCommand(input.substring(1))
+      } else {
+        await processCode(input);
+      }
     }
   };
 
